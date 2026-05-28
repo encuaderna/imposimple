@@ -250,12 +250,11 @@ function renderSheetFace(doc, sheet, face, signature, marksConfig, physicalPageS
 
   // ── Compensación de creep: banda en el margen interior de cada página
   if (sheet.creep > 0) {
-    const creepWidth = Math.min(sheet.creep * 2, boxW * 0.08); // escalar a mm del PDF
-    doc.setFillColor(66, 133, 244, 0.08); // azul suave semitransparente
-    // Izquierda: margen interior derecho
+    const creepWidth = Math.min(sheet.creep, boxW * 0.06); // aplicar creep directo en mm
+    // Izquierda: margen interior derecho (desplaza hacia adentro)
     doc.setFillColor(235, 242, 255);
     doc.rect(cx - creepWidth, boxY, creepWidth, boxH, "F");
-    // Derecha: margen interior izquierdo
+    // Derecha: margen interior izquierdo (desplaza hacia adentro)
     doc.rect(cx, boxY, creepWidth, boxH, "F");
   }
 
@@ -292,11 +291,11 @@ function renderSheetFace(doc, sheet, face, signature, marksConfig, physicalPageS
 
       // Indicador de creep en el margen interior
       if (sheet.creep > 0) {
-        const creepX = pos === "IZQ" ? cx - 1.5 : cx + 1.5;
+        const creepX = pos === "IZQ" ? cx - 0.8 : cx + 0.8;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(5);
         doc.setTextColor(BRAND);
-        doc.text(`◂ ${sheet.creep}mm`, creepX, boxY + 6, { align: pos === "IZQ" ? "right" : "left" });
+        doc.text(`◂${sheet.creep}`, creepX, boxY + 6, { align: pos === "IZQ" ? "right" : "left" });
       }
     }
   });
