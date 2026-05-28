@@ -18,6 +18,7 @@ import ConfigPanel from "@/components/imposition/ConfigPanel";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useAppPreferences } from "@/hooks/useAppPreferences";
 import { useImpositionConfig, DEFAULT_MARKS } from "@/hooks/useImpositionConfig";
+import { useProjects } from "@/hooks/useProjects";
 import MarksConfigTable from "@/components/imposition/MarksConfigTable";
 import SummaryPanel from "@/components/imposition/SummaryPanel";
 import SignatureCard from "@/components/imposition/SignatureCard";
@@ -25,6 +26,7 @@ import CreepChart from "@/components/imposition/CreepChart";
 import FlowDiagram from "@/components/imposition/FlowDiagram";
 import PreviewPanel from "@/components/imposition/PreviewPanel";
 import AdvancedExportModal from "@/components/imposition/AdvancedExportModal";
+import ProjectsPanel from "@/components/imposition/ProjectsPanel";
 
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -35,6 +37,15 @@ export default function Home() {
   const [pdfFile, setPdfFile] = useState(null);
   const [focusStep, setFocusStep] = useState(0);
   const { profiles, save: saveProfile, remove: removeProfile } = useProfiles();
+  const {
+    projects,
+    saveProject,
+    deleteProject,
+    renameProject,
+    loadProject,
+    duplicateProject,
+  } = useProjects();
+  const [currentProjectName, setCurrentProjectName] = useState(null);
 
   const setTextScale = (fn) => updatePref("textScale", typeof fn === "function" ? fn(textScale) : fn);
 
@@ -74,7 +85,19 @@ export default function Home() {
 
   const handleReset = () => {
     resetConfig();
+    setCurrentProjectName(null);
     toast.success("Configuración reiniciada");
+  };
+
+  const handleSaveProject = (name) => {
+    saveProject(name, config, imposition, summary, marksConfig);
+    setCurrentProjectName(name);
+  };
+
+  const handleLoadProject = (project) => {
+    setConfig(project.config);
+    setMarksConfig(project.marksConfig);
+    setCurrentProjectName(project.name);
   };
 
   const handleExportSpecSheet = () => {
@@ -165,6 +188,15 @@ export default function Home() {
 
           {/* Panel izquierdo: Configuración */}
           <aside className="lg:col-span-3 space-y-4">
+            <ProjectsPanel
+              projects={projects}
+              onLoadProject={handleLoadProject}
+              onDeleteProject={deleteProject}
+              onRenameProject={renameProject}
+              onDuplicateProject={duplicateProject}
+              onSaveCurrentProject={handleSaveProject}
+              currentProjectName={currentProjectName}
+            />
             <ProfileManager
               config={config}
               onLoad={(cfg) => setConfig({ ...cfg })}
