@@ -11,6 +11,7 @@ import { Settings2, BookOpen, Ruler, Layers, Printer, LayoutGrid, Info, Upload, 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import PdfUploadZone from "@/components/imposition/PdfUploadZone";
 import PaperAdvisor from "@/components/imposition/PaperAdvisor";
+import PaperPresetsPanel from "@/components/imposition/PaperPresetsPanel";
 
 /** Burbuja de ayuda con ícono "i" azul visible */
 function InfoTip({ text }) {
@@ -38,8 +39,8 @@ function EduNote({ children }) {
   );
 }
 
-const SECTIONS = ["pdf", "documento", "impresora", "tamaño", "pliego", "encuadernacion", "creep"];
-const SECTION_LABELS = ["PDF", "Documento", "Impresora", "Tamaño", "Pliego", "Encuadernación", "Creep"];
+const SECTIONS = ["pdf", "documento", "impresora", "tamaño", "pliego", "encuadernacion", "papel", "creep"];
+const SECTION_LABELS = ["PDF", "Documento", "Impresora", "Tamaño", "Pliego", "Encuadernación", "Mis papeles", "Creep"];
 
 export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChange, focusMode, focusStep, onFocusStepChange }) {
   const update = (key, value) => onConfigChange({ ...config, [key]: value });
@@ -338,8 +339,16 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
         </CardContent>
       </Card>}
 
+      {/* Mis papeles favoritos */}
+      {isVisible(6) && (
+        <PaperPresetsPanel
+          currentThickness={config.paperThickness}
+          onApply={(t) => update("paperThickness", t)}
+        />
+      )}
+
       {/* Compensación de Creep */}
-      {isVisible(6) && <Card className="border-border/50">
+      {isVisible(7) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <Settings2 className="w-4 h-4" />
