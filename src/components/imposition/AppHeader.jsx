@@ -1,10 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles, FileText } from "lucide-react";
+import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles, FileText, Printer, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function AppHeader({
-  onReset, onExport, onExportSpecSheet, hasImposition,
+  onReset, onExport, onExportSpecSheet, onExportPrepress, exportingPrepress, hasImposition,
   dyslexicFont, onToggleDyslexicFont,
   focusMode, onToggleFocusMode,
   highContrast, onToggleHighContrast,
@@ -94,11 +94,23 @@ export default function AppHeader({
             <>
               <Button variant="outline" size="sm" onClick={onExportSpecSheet} className="text-xs gap-1.5 rounded-xl shadow-sm border-primary/40 text-primary hover:bg-primary/10">
                 <FileText className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Hoja de especificaciones</span>
+                <span className="hidden sm:inline">Especificaciones</span>
+              </Button>
+              <Button
+                size="sm"
+                onClick={onExportPrepress}
+                disabled={exportingPrepress}
+                className="text-xs gap-1.5 rounded-xl shadow-sm bg-accent hover:bg-accent/90 text-accent-foreground"
+              >
+                {exportingPrepress
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Printer className="w-3.5 h-3.5" />
+                }
+                <span className="hidden sm:inline">{exportingPrepress ? "Generando…" : "PDF Preimpresión"}</span>
               </Button>
               <Button size="sm" onClick={onExport} className="text-xs gap-1.5 rounded-xl shadow-sm">
                 <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Exportar JSON</span>
+                <span className="hidden sm:inline">JSON</span>
               </Button>
             </>
           )}

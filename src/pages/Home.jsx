@@ -10,6 +10,7 @@ import {
   PAGE_SIZES,
 } from "@/lib/imposition-engine";
 import { generateSpecSheetPDF } from "@/lib/spec-sheet-pdf";
+import { generatePrepressPDF } from "@/lib/prepress-pdf";
 import AppHeader from "@/components/imposition/AppHeader";
 import ProgressBar from "@/components/imposition/ProgressBar";
 import ProfileManager from "@/components/imposition/ProfileManager";
@@ -81,6 +82,19 @@ export default function Home() {
     toast.success("Hoja de especificaciones exportada");
   };
 
+  const [exportingPrepress, setExportingPrepress] = useState(false);
+
+  const handleExportPrepress = async () => {
+    if (!imposition || !summary) return;
+    setExportingPrepress(true);
+    try {
+      const filename = await generatePrepressPDF({ config, imposition, summary, marksConfig });
+      toast.success(`PDF de preimpresión exportado: ${filename}`);
+    } finally {
+      setExportingPrepress(false);
+    }
+  };
+
   const handleExport = () => {
     const data = {
       config,
@@ -119,6 +133,8 @@ export default function Home() {
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         onShowWelcome={() => setShowWelcome(true)}
         onExportSpecSheet={handleExportSpecSheet}
+        onExportPrepress={handleExportPrepress}
+        exportingPrepress={exportingPrepress}
         dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => togglePref("dyslexicFont")}
         focusMode={focusMode} onToggleFocusMode={() => togglePref("focusMode")}
         highContrast={highContrast} onToggleHighContrast={() => togglePref("highContrast")}
