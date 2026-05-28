@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import Welcome from "@/pages/Welcome";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -43,6 +44,7 @@ const DEFAULT_MARKS = Object.fromEntries(
 );
 
 export default function Home() {
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem("welcome_seen"));
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [marksConfig, setMarksConfig] = useState(DEFAULT_MARKS);
   const [activeTab, setActiveTab] = useState("signatures");
@@ -110,6 +112,15 @@ export default function Home() {
     URL.revokeObjectURL(url);
     toast.success("Esquema de imposición exportado");
   };
+
+  if (showWelcome) {
+    return (
+      <Welcome onStart={() => {
+        localStorage.setItem("welcome_seen", "1");
+        setShowWelcome(false);
+      }} />
+    );
+  }
 
   const contrastStyle = highContrast ? {
     filter: "contrast(1.5) saturate(0.8)",
