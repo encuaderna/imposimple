@@ -10,6 +10,7 @@ import { PAGE_SIZES, BINDING_METHODS, PAGE_FORMATS } from "@/lib/imposition-engi
 import { Settings2, BookOpen, Ruler, Layers, Printer, LayoutGrid, Info, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import PdfUploadZone from "@/components/imposition/PdfUploadZone";
+import PaperAdvisor from "@/components/imposition/PaperAdvisor";
 
 /** Burbuja de ayuda con ícono "i" azul visible */
 function InfoTip({ text }) {
@@ -324,6 +325,16 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
           <EduNote>
             «Cosido» es el método tradicional de los libros de calidad: se cose hilo por el lomo de cada cuadernillo. «Perfecta» usa pegamento caliente, como los libros de bolsillo modernos.
           </EduNote>
+
+          {/* Asesor de papel */}
+          {config.bindingMethod && config.totalPages >= 4 && (
+            <PaperAdvisor
+              bindingMethod={config.bindingMethod}
+              totalPages={config.totalPages}
+              pagesPerSignature={config.pagesPerSignature}
+              onApplyThickness={(t) => update("paperThickness", t)}
+            />
+          )}
         </CardContent>
       </Card>}
 
