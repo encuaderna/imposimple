@@ -46,7 +46,7 @@ const DEFAULT_MARKS = Object.fromEntries(
 );
 
 export default function Home() {
-  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem("welcome_seen"));
+  const [showWelcome, setShowWelcome] = useState(true);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [marksConfig, setMarksConfig] = useState(DEFAULT_MARKS);
   const [activeTab, setActiveTab] = useState("signatures");
@@ -119,7 +119,6 @@ export default function Home() {
   if (showWelcome) {
     return (
       <Welcome onStart={() => {
-        localStorage.setItem("welcome_seen", "1");
         setShowWelcome(false);
       }} />
     );
@@ -135,6 +134,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50/40 to-purple-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
+        onShowWelcome={() => setShowWelcome(true)}
         dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)}
         focusMode={focusMode} onToggleFocusMode={() => setFocusMode(v => !v)}
         highContrast={highContrast} onToggleHighContrast={() => setHighContrast(v => !v)}

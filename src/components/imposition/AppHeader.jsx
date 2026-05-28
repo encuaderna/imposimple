@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut } from "lucide-react";
+import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function AppHeader({
@@ -9,6 +9,7 @@ export default function AppHeader({
   focusMode, onToggleFocusMode,
   highContrast, onToggleHighContrast,
   textScale, onTextScaleUp, onTextScaleDown,
+  onShowWelcome,
 }) {
   const { theme, setTheme } = useTheme();
 
@@ -77,6 +78,11 @@ export default function AppHeader({
           <Button variant="ghost" size="icon" className="w-8 h-8 rounded-xl" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             <Sun className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
+
+          <Button variant="ghost" size="sm" onClick={onShowWelcome} className="text-xs gap-1.5 rounded-xl text-muted-foreground">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Intro</span>
           </Button>
 
           <Button variant="ghost" size="sm" onClick={onReset} className="text-xs gap-1.5 rounded-xl text-muted-foreground">
