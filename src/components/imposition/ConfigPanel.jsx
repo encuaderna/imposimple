@@ -13,6 +13,8 @@ import PdfUploadZone from "@/components/imposition/PdfUploadZone";
 import PaperAdvisor from "@/components/imposition/PaperAdvisor";
 import PaperPresetsPanel from "@/components/imposition/PaperPresetsPanel";
 import RealtimeImpositionPreview from "@/components/imposition/RealtimeImpositionPreview";
+import ValidationWarnings from "@/components/imposition/ValidationWarnings";
+import { useImpositionValidation } from "@/hooks/useImpositionValidation";
 
 /** Burbuja de ayuda con ícono "i" azul visible */
 function InfoTip({ text }) {
@@ -50,8 +52,23 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
 
   const isVisible = (sectionIndex) => !focusMode || focusStep === sectionIndex;
 
+  // Validación en tiempo real
+  const issues = useImpositionValidation(config, imposition, imposition ? {
+    totalWithBlanks: imposition.signatures.reduce((sum, s) => sum + s.sheets.reduce((ss, sh) => ss + (sh.front.left ? 1 : 0) + (sh.front.right ? 1 : 0), 0), 0),
+    totalSignatures: imposition.signatures.length,
+    totalSheets: imposition.signatures.reduce((sum, s) => sum + s.sheets.length, 0),
+    sheetsPerSignature: imposition.signatures[0]?.sheets.length || 0,
+    pagesPerSignature: config.pagesPerSignature,
+    blankPagesAdded: config.blankPagesStart + config.blankPagesEnd,
+    totalCreepMm: imposition.signatures.reduce((sum, s) => sum + Math.max(...s.sheets.map(sh => sh.creep || 0)), 0),
+    avgCreepPerSheet: imposition.signatures.reduce((sum, s) => sum + s.sheets.reduce((ss, sh) => ss + (sh.creep || 0), 0) / s.sheets.length, 0) / imposition.signatures.length,
+  } : null);
+
   return (
     <div className="space-y-4">
+      {/* Avisos de validación */}
+      {!focusMode && <ValidationWarnings issues={issues} />}
+
       {focusMode && (
         <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-xl px-4 py-2">
           <button onClick={() => onFocusStepChange(Math.max(0, focusStep - 1))} disabled={focusStep === 0} className="p-1 rounded hover:bg-primary/10 disabled:opacity-30">
