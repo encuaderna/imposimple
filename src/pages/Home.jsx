@@ -10,6 +10,7 @@ import {
   TECHNICAL_MARKS,
 } from "@/lib/imposition-engine";
 import AppHeader from "@/components/imposition/AppHeader";
+import ProgressBar from "@/components/imposition/ProgressBar";
 import ConfigPanel from "@/components/imposition/ConfigPanel";
 import MarksConfigTable from "@/components/imposition/MarksConfigTable";
 import SummaryPanel from "@/components/imposition/SummaryPanel";
@@ -47,6 +48,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("signatures");
   const [pdfFile, setPdfFile] = useState(null);
   const [dyslexicFont, setDyslexicFont] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const [highContrast, setHighContrast] = useState(false);
+  const [focusStep, setFocusStep] = useState(0);
 
   const imposition = useMemo(() => {
     if (config.totalPages < 4) return null;
@@ -57,6 +61,13 @@ export default function Home() {
     if (!imposition) return null;
     return getImpositionSummary(imposition);
   }, [imposition]);
+
+  // Calcular paso actual para la barra de progreso
+  const progressStep = !pdfFile ? "pdf"
+    : config.totalPages < 4 ? "pages"
+    : config.pageSize === "Custom" && (!config.customWidth || !config.customHeight) ? "format"
+    : !config.bindingMethod ? "binding"
+    : "calculated";
 
   const currentPageSize = config.pageSize === "Custom"
     ? { width: config.customWidth, height: config.customHeight }
@@ -86,17 +97,34 @@ export default function Home() {
     toast.success("Esquema de imposición exportado");
   };
 
+  const contrastStyle = highContrast ? {
+    filter: "contrast(1.5) saturate(0.8)",
+    background: "#000",
+    color: "#fff",
+  } : {};
+
   return (
-    <div className="min-h-screen bg-background" style={dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}}>
-      <AppHeader onReset={handleReset} onExport={handleExport} hasImposition={!!imposition} dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)} />
+    <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle }}>
+      <AppHeader
+        onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
+        dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)}
+        focusMode={focusMode} onToggleFocusMode={() => setFocusMode(v => !v)}
+        highContrast={highContrast} onToggleHighContrast={() => setHighContrast(v => !v)}
+      />
 
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
+        <ProgressBar currentStep={progressStep} />
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* Panel izquierdo: Configuración */}
           <aside className="lg:col-span-3 space-y-4">
-            <ConfigPanel config={config} onConfigChange={setConfig} pdfFile={pdfFile} onPdfChange={setPdfFile} />
-            <MarksConfigTable marksConfig={marksConfig} onMarksChange={setMarksConfig} />
+            <ConfigPanel
+              config={config} onConfigChange={setConfig}
+              pdfFile={pdfFile} onPdfChange={setPdfFile}
+              focusMode={focusMode} focusStep={focusStep} onFocusStepChange={setFocusStep}
+            />
+            {!focusMode && <MarksConfigTable marksConfig={marksConfig} onMarksChange={setMarksConfig} />}
           </aside>
 
           {/* Panel principal: Resultados */}

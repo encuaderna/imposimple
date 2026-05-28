@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { PAGE_SIZES, BINDING_METHODS, PAGE_FORMATS } from "@/lib/imposition-engine";
-import { Settings2, BookOpen, Ruler, Layers, Printer, LayoutGrid, Info, Upload } from "lucide-react";
+import { Settings2, BookOpen, Ruler, Layers, Printer, LayoutGrid, Info, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import PdfUploadZone from "@/components/imposition/PdfUploadZone";
 
@@ -37,16 +37,34 @@ function EduNote({ children }) {
   );
 }
 
-export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChange }) {
+const SECTIONS = ["pdf", "documento", "impresora", "tamaño", "pliego", "encuadernacion", "creep"];
+const SECTION_LABELS = ["PDF", "Documento", "Impresora", "Tamaño", "Pliego", "Encuadernación", "Creep"];
+
+export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChange, focusMode, focusStep, onFocusStepChange }) {
   const update = (key, value) => onConfigChange({ ...config, [key]: value });
 
   const fmt = PAGE_FORMATS[config.pageFormat || "quarto"];
 
+  const isVisible = (sectionIndex) => !focusMode || focusStep === sectionIndex;
+
   return (
     <div className="space-y-4">
+      {focusMode && (
+        <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-xl px-4 py-2">
+          <button onClick={() => onFocusStepChange(Math.max(0, focusStep - 1))} disabled={focusStep === 0} className="p-1 rounded hover:bg-primary/10 disabled:opacity-30">
+            <ChevronLeft className="w-4 h-4 text-primary" />
+          </button>
+          <span className="text-xs font-semibold text-primary">
+            Paso {focusStep + 1} de {SECTIONS.length}: {SECTION_LABELS[focusStep]}
+          </span>
+          <button onClick={() => onFocusStepChange(Math.min(SECTIONS.length - 1, focusStep + 1))} disabled={focusStep === SECTIONS.length - 1} className="p-1 rounded hover:bg-primary/10 disabled:opacity-30">
+            <ChevronRight className="w-4 h-4 text-primary" />
+          </button>
+        </div>
+      )}
 
       {/* Subir PDF */}
-      <Card className="border-primary/30 bg-primary/5">
+      {isVisible(0) && <Card className="border-primary/30 bg-primary/5">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-primary uppercase tracking-wider">
             <Upload className="w-4 h-4" />
@@ -59,10 +77,10 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             Aquí subes el libro o documento que quieres imprimir. El sistema lo va a dividir automáticamente en cuadernillos numerados (1, 2, 3…) listos para doblar y coser.
           </EduNote>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Documento */}
-      <Card className="border-border/50">
+      {isVisible(1) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <BookOpen className="w-4 h-4" />
@@ -96,10 +114,10 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             </EduNote>
           </div>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Impresora */}
-      <Card className="border-border/50">
+      {isVisible(2) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <Printer className="w-4 h-4" />
@@ -139,10 +157,10 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             />
           </div>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Tamaño de página */}
-      <Card className="border-border/50">
+      {isVisible(3) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <Ruler className="w-4 h-4" />
@@ -184,10 +202,10 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Formato de pliego */}
-      <Card className="border-border/50">
+      {isVisible(4) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <LayoutGrid className="w-4 h-4" />
@@ -276,10 +294,10 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Encuadernación */}
-      <Card className="border-border/50">
+      {isVisible(5) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <Layers className="w-4 h-4" />
@@ -307,10 +325,10 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             «Cosido» es el método tradicional de los libros de calidad: se cose hilo por el lomo de cada cuadernillo. «Perfecta» usa pegamento caliente, como los libros de bolsillo modernos.
           </EduNote>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Compensación de Creep */}
-      <Card className="border-border/50">
+      {isVisible(6) && <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
             <Settings2 className="w-4 h-4" />
@@ -370,7 +388,7 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card>}
 
     </div>
   );
