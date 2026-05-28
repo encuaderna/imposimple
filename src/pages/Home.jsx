@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Calculator, Eye, BarChart3, GitBranch, Layers } from "lucide-react";
+import { Calculator, Eye, BarChart3, GitBranch, Layers, FileUp, SlidersHorizontal, BookCopy, Scissors, CheckCircle2 } from "lucide-react";
 import {
   calculateImposition,
   getImpositionSummary,
@@ -51,6 +51,20 @@ export default function Home() {
   const [focusMode, setFocusMode] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [focusStep, setFocusStep] = useState(0);
+  const [textScale, setTextScale] = useState(1.0);
+
+  // Navegación por teclado: atajos globales
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.altKey && e.key === "+") { e.preventDefault(); setTextScale(v => Math.min(1.5, +(v + 0.1).toFixed(1))); }
+      if (e.altKey && e.key === "-") { e.preventDefault(); setTextScale(v => Math.max(0.8, +(v - 0.1).toFixed(1))); }
+      if (e.altKey && e.key === "d") { e.preventDefault(); setDyslexicFont(v => !v); }
+      if (e.altKey && e.key === "f") { e.preventDefault(); setFocusMode(v => !v); }
+      if (e.altKey && e.key === "c") { e.preventDefault(); setHighContrast(v => !v); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const imposition = useMemo(() => {
     if (config.totalPages < 4) return null;
@@ -104,12 +118,15 @@ export default function Home() {
   } : {};
 
   return (
-    <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle }}>
+    <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)}
         focusMode={focusMode} onToggleFocusMode={() => setFocusMode(v => !v)}
         highContrast={highContrast} onToggleHighContrast={() => setHighContrast(v => !v)}
+        textScale={textScale}
+        onTextScaleUp={() => setTextScale(v => Math.min(1.5, +(v + 0.1).toFixed(1)))}
+        onTextScaleDown={() => setTextScale(v => Math.max(0.8, +(v - 0.1).toFixed(1)))}
       />
 
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
@@ -139,28 +156,37 @@ export default function Home() {
               </div>
             )}
 
-            {/* Estado vacío */}
+            {/* Estado vacío — Modo guiado visual */}
             {!imposition && (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                  <Calculator className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <h2 className="text-lg font-semibold">¿Cómo funciona esto?</h2>
-                <p className="text-sm text-muted-foreground mt-2 max-w-sm leading-relaxed">
-                  Sube tu PDF y configura los parámetros en el panel izquierdo. El sistema calculará automáticamente cómo dividir tu libro en <strong>cuadernillos numerados</strong> (1, 2, 3…) listos para imprimir, doblar y encuadernar.
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <h2 className="text-lg font-semibold mb-1">¿Cómo funciona?</h2>
+                <p className="text-sm text-muted-foreground max-w-md leading-relaxed mb-8">
+                  Sigue estos pasos para convertir tu PDF en cuadernillos listos para imprimir y encuadernar.
                 </p>
-                <div className="mt-6 grid grid-cols-3 gap-4 max-w-sm text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 w-full max-w-2xl">
                   {[
-                    { n: "1", label: "Sube el PDF" },
-                    { n: "2", label: "Configura los parámetros" },
-                    { n: "3", label: "Exporta los cuadernillos" },
-                  ].map(({ n, label }) => (
-                    <div key={n} className="flex flex-col items-center gap-1">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center border border-primary/20">{n}</div>
-                      <p className="text-[11px] text-muted-foreground leading-tight">{label}</p>
-                    </div>
+                    { icon: FileUp, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-800", step: "1", title: "Sube tu PDF", desc: "Arrastra o selecciona el archivo de tu libro" },
+                    { icon: SlidersHorizontal, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-200 dark:border-purple-800", step: "2", title: "Elige el tamaño", desc: "A5, A4, carta u otro formato" },
+                    { icon: BookCopy, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-200 dark:border-amber-800", step: "3", title: "Define el pliego", desc: "Cuántas páginas por cuadernillo" },
+                    { icon: Scissors, color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-950/30", border: "border-rose-200 dark:border-rose-800", step: "4", title: "Encuadernación", desc: "Cosido, pegado o grapado" },
+                    { icon: CheckCircle2, color: "text-green-500", bg: "bg-green-50 dark:bg-green-950/30", border: "border-green-200 dark:border-green-800", step: "5", title: "¡Listo!", desc: "Exporta e imprime cada cuadernillo" },
+                  ].map(({ icon: Icon, color, bg, border, step, title, desc }, i) => (
+                    <React.Fragment key={step}>
+                      <div className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${bg} ${border}`}>
+                        <div className={`w-10 h-10 rounded-full ${bg} border ${border} flex items-center justify-center`}>
+                          <Icon className={`w-5 h-5 ${color}`} />
+                        </div>
+                        <span className={`text-[10px] font-bold font-mono ${color}`}>PASO {step}</span>
+                        <p className="text-xs font-semibold leading-tight">{title}</p>
+                        <p className="text-[11px] text-muted-foreground leading-snug">{desc}</p>
+                      </div>
+                      {i < 4 && <div className="hidden sm:flex items-center justify-center text-muted-foreground/30 text-xl">→</div>}
+                    </React.Fragment>
                   ))}
                 </div>
+                <p className="text-[11px] text-muted-foreground mt-6 border border-border/50 rounded-lg px-3 py-2 bg-muted/30">
+                  💡 <strong>Atajos de teclado:</strong> Alt+D (dislexia) · Alt+F (enfoque) · Alt+C (contraste) · Alt++ / Alt+− (tamaño de texto)
+                </p>
               </div>
             )}
 

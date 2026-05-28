@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast } from "lucide-react";
+import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function AppHeader({
@@ -8,6 +8,7 @@ export default function AppHeader({
   dyslexicFont, onToggleDyslexicFont,
   focusMode, onToggleFocusMode,
   highContrast, onToggleHighContrast,
+  textScale, onTextScaleUp, onTextScaleDown,
 }) {
   const { theme, setTheme } = useTheme();
 
@@ -42,6 +43,17 @@ export default function AppHeader({
             <Contrast className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{highContrast ? "Contraste: ON" : "Contraste"}</span>
           </Button>
+
+          {/* Escalado de texto */}
+          <div className="flex items-center gap-0.5 border border-border/50 rounded-md overflow-hidden">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-none text-xs" onClick={onTextScaleDown} title="Reducir texto" disabled={textScale <= 0.8}>
+              <ZoomOut className="w-3.5 h-3.5" />
+            </Button>
+            <span className="text-[10px] font-mono text-muted-foreground px-1 select-none">{Math.round(textScale * 100)}%</span>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-none text-xs" onClick={onTextScaleUp} title="Aumentar texto" disabled={textScale >= 1.5}>
+              <ZoomIn className="w-3.5 h-3.5" />
+            </Button>
+          </div>
 
           {/* Tema claro/oscuro */}
           <Button variant="ghost" size="icon" className="w-8 h-8" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
