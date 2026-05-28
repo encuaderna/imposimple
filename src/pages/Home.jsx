@@ -131,7 +131,7 @@ export default function Home() {
   } : {};
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50/40 to-purple-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
+    <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         onShowWelcome={() => setShowWelcome(true)}

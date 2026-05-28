@@ -10,74 +10,90 @@
     --font-mono: 'Open Sans', sans-serif;
     --font-sans: 'Inter', sans-serif;
 
-    --background: 220 20% 97%;
-    --foreground: 220 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
-    --primary: 220 70% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 92%;
-    --secondary-foreground: 220 20% 20%;
-    --muted: 220 15% 94%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 160 60% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 220 70% 50%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 280 60% 55%;
-    --chart-4: 35 90% 55%;
-    --chart-5: 0 72% 51%;
+    /* ── Paleta calmante · modo claro ──────────────────────────────
+       Tono 1 · Lino frío:      hsl(215 18% 96%)  — fondo base
+       Tono 2 · Niebla azulada: hsl(215 14% 89%)  — bordes y superficies
+       Tono 3 · Pizarra media:  hsl(215 16% 52%)  — primario / acción
+       Tono 4 · Salvia fría:    hsl(185 18% 44%)  — acento secundario
+       Tono 5 · Carbón suave:   hsl(215 18% 22%)  — texto principal
+    ─────────────────────────────────────────────────────────────── */
+
+    --background: 215 18% 96%;
+    --foreground: 215 18% 22%;
+    --card: 215 20% 99%;
+    --card-foreground: 215 18% 22%;
+    --popover: 215 20% 99%;
+    --popover-foreground: 215 18% 22%;
+    --primary: 215 28% 42%;
+    --primary-foreground: 215 20% 97%;
+    --secondary: 215 14% 90%;
+    --secondary-foreground: 215 18% 28%;
+    --muted: 215 14% 92%;
+    --muted-foreground: 215 12% 48%;
+    --accent: 185 18% 40%;
+    --accent-foreground: 185 20% 97%;
+    --destructive: 4 45% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 14% 87%;
+    --input: 215 14% 87%;
+    --ring: 215 28% 42%;
+    --chart-1: 215 28% 42%;
+    --chart-2: 185 18% 40%;
+    --chart-3: 240 18% 54%;
+    --chart-4: 195 20% 46%;
+    --chart-5: 4 45% 48%;
     --radius: 0.625rem;
-    --sidebar-background: 220 25% 12%;
-    --sidebar-foreground: 220 15% 85%;
-    --sidebar-primary: 220 70% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 220 15% 90%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 220 70% 50%;
+    --sidebar-background: 215 22% 18%;
+    --sidebar-foreground: 215 14% 82%;
+    --sidebar-primary: 215 28% 58%;
+    --sidebar-primary-foreground: 215 20% 97%;
+    --sidebar-accent: 215 20% 24%;
+    --sidebar-accent-foreground: 215 14% 88%;
+    --sidebar-border: 215 18% 26%;
+    --sidebar-ring: 215 28% 52%;
   }
 
   .dark {
-    --background: 220 25% 8%;
-    --foreground: 220 15% 92%;
-    --card: 220 25% 11%;
-    --card-foreground: 220 15% 92%;
-    --popover: 220 25% 11%;
-    --popover-foreground: 220 15% 92%;
-    --primary: 220 70% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 16%;
-    --secondary-foreground: 220 15% 85%;
-    --muted: 220 20% 14%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 160 60% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 220 70% 55%;
-    --chart-1: 220 70% 55%;
-    --chart-2: 160 60% 50%;
-    --chart-3: 280 60% 60%;
-    --chart-4: 35 90% 60%;
-    --chart-5: 0 72% 55%;
-    --sidebar-background: 220 25% 6%;
-    --sidebar-foreground: 220 15% 85%;
-    --sidebar-primary: 220 70% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 12%;
-    --sidebar-accent-foreground: 220 15% 90%;
-    --sidebar-border: 220 20% 14%;
-    --sidebar-ring: 220 70% 55%;
+    /* ── Paleta calmante · modo oscuro ──────────────────────────────
+       Tono 1 · Antracita profundo: hsl(215 20% 10%)  — fondo base
+       Tono 2 · Pizarra oscura:     hsl(215 18% 15%)  — superficies / cards
+       Tono 3 · Pizarra clara:      hsl(215 24% 58%)  — primario / acción
+       Tono 4 · Salvia apagada:     hsl(185 16% 50%)  — acento secundario
+       Tono 5 · Perla grisácea:     hsl(215 14% 84%)  — texto principal
+    ─────────────────────────────────────────────────────────────── */
+
+    --background: 215 20% 10%;
+    --foreground: 215 14% 84%;
+    --card: 215 18% 13%;
+    --card-foreground: 215 14% 84%;
+    --popover: 215 18% 13%;
+    --popover-foreground: 215 14% 84%;
+    --primary: 215 24% 58%;
+    --primary-foreground: 215 20% 10%;
+    --secondary: 215 16% 18%;
+    --secondary-foreground: 215 14% 78%;
+    --muted: 215 16% 16%;
+    --muted-foreground: 215 10% 54%;
+    --accent: 185 16% 46%;
+    --accent-foreground: 215 20% 10%;
+    --destructive: 4 40% 52%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 16% 20%;
+    --input: 215 16% 20%;
+    --ring: 215 24% 52%;
+    --chart-1: 215 24% 58%;
+    --chart-2: 185 16% 50%;
+    --chart-3: 240 16% 60%;
+    --chart-4: 195 18% 52%;
+    --chart-5: 4 40% 52%;
+    --sidebar-background: 215 22% 7%;
+    --sidebar-foreground: 215 14% 80%;
+    --sidebar-primary: 215 24% 58%;
+    --sidebar-primary-foreground: 215 20% 10%;
+    --sidebar-accent: 215 18% 14%;
+    --sidebar-accent-foreground: 215 14% 84%;
+    --sidebar-border: 215 16% 18%;
+    --sidebar-ring: 215 24% 52%;
   }
 }
 
