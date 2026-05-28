@@ -1,0 +1,101 @@
+{
+  "name": "ImpositionProject",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del proyecto"
+    },
+    "total_pages": {
+      "type": "number",
+      "description": "Total de p\u00e1ginas del documento"
+    },
+    "page_size": {
+      "type": "string",
+      "enum": [
+        "A4",
+        "A5",
+        "Letter",
+        "Half-Letter",
+        "B5",
+        "Crown Quarto",
+        "Royal",
+        "Custom"
+      ],
+      "default": "A5",
+      "description": "Tama\u00f1o de p\u00e1gina"
+    },
+    "custom_width": {
+      "type": "number",
+      "description": "Ancho personalizado en mm"
+    },
+    "custom_height": {
+      "type": "number",
+      "description": "Alto personalizado en mm"
+    },
+    "binding_method": {
+      "type": "string",
+      "enum": [
+        "saddle_stitch",
+        "perfect_bind",
+        "sewn",
+        "section_sewn"
+      ],
+      "default": "sewn",
+      "description": "M\u00e9todo de encuadernaci\u00f3n"
+    },
+    "pages_per_signature": {
+      "type": "number",
+      "enum": [
+        8,
+        16,
+        32
+      ],
+      "default": 16,
+      "description": "P\u00e1ginas por cuadernillo"
+    },
+    "paper_thickness": {
+      "type": "number",
+      "default": 0.1,
+      "description": "Grosor del papel en mm"
+    },
+    "creep_factor": {
+      "type": "number",
+      "default": 0.8,
+      "description": "Factor de acumulaci\u00f3n de creep (0.5-1.0)"
+    },
+    "blank_pages_start": {
+      "type": "number",
+      "default": 0,
+      "description": "P\u00e1ginas en blanco al inicio"
+    },
+    "blank_pages_end": {
+      "type": "number",
+      "default": 0,
+      "description": "P\u00e1ginas en blanco al final"
+    },
+    "marks_config": {
+      "type": "object",
+      "description": "Configuraci\u00f3n de marcas t\u00e9cnicas habilitadas"
+    },
+    "pdf_file_url": {
+      "type": "string",
+      "description": "URL del archivo PDF cargado"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "configured",
+        "calculated",
+        "exported"
+      ],
+      "default": "draft",
+      "description": "Estado del proyecto"
+    }
+  },
+  "required": [
+    "name",
+    "total_pages"
+  ]
+}
