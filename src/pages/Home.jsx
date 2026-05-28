@@ -129,7 +129,7 @@ export default function Home() {
   } : {};
 
   return (
-    <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50/40 to-purple-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)}
@@ -160,10 +160,10 @@ export default function Home() {
             {/* Resumen rápido */}
             {summary && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <QuickStat label="Páginas" value={summary.totalWithBlanks} sub={`+${summary.blankPagesAdded} blancos`} />
-                <QuickStat label="Cuadernillos" value={summary.totalSignatures} sub={`${summary.pagesPerSignature} págs c/u`} />
-                <QuickStat label="Hojas totales" value={summary.totalSheets} sub={`${summary.sheetsPerSignature} por cuad.`} />
-                <QuickStat label="Creep total" value={`${summary.totalCreepMm}mm`} sub={`${summary.avgCreepPerSheet}mm/hoja`} />
+                <QuickStat label="Páginas" value={summary.totalWithBlanks} sub={`+${summary.blankPagesAdded} blancos`} colorIndex={0} />
+                <QuickStat label="Cuadernillos" value={summary.totalSignatures} sub={`${summary.pagesPerSignature} págs c/u`} colorIndex={1} />
+                <QuickStat label="Hojas totales" value={summary.totalSheets} sub={`${summary.sheetsPerSignature} por cuad.`} colorIndex={2} />
+                <QuickStat label="Creep total" value={`${summary.totalCreepMm}mm`} sub={`${summary.avgCreepPerSheet}mm/hoja`} colorIndex={3} />
               </div>
             )}
 
@@ -261,11 +261,18 @@ export default function Home() {
   );
 }
 
-function QuickStat({ label, value, sub }) {
+const STAT_COLORS = [
+  "from-blue-50 to-blue-100/50 border-blue-200 dark:from-blue-950/30 dark:to-blue-900/20 dark:border-blue-800",
+  "from-purple-50 to-purple-100/50 border-purple-200 dark:from-purple-950/30 dark:to-purple-900/20 dark:border-purple-800",
+  "from-amber-50 to-amber-100/50 border-amber-200 dark:from-amber-950/30 dark:to-amber-900/20 dark:border-amber-800",
+  "from-rose-50 to-rose-100/50 border-rose-200 dark:from-rose-950/30 dark:to-rose-900/20 dark:border-rose-800",
+];
+
+function QuickStat({ label, value, sub, colorIndex = 0 }) {
   return (
-    <div className="bg-card border border-border/50 rounded-xl p-3">
+    <div className={`bg-gradient-to-br ${STAT_COLORS[colorIndex]} border rounded-2xl p-4 shadow-sm`}>
       <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">{label}</p>
-      <p className="text-xl font-bold font-mono mt-1">{value}</p>
+      <p className="text-2xl font-bold font-mono mt-1">{value}</p>
       {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
