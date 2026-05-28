@@ -8,13 +8,14 @@ import {
   calculateImposition,
   getImpositionSummary,
   PAGE_SIZES,
-  TECHNICAL_MARKS,
 } from "@/lib/imposition-engine";
 import AppHeader from "@/components/imposition/AppHeader";
 import ProgressBar from "@/components/imposition/ProgressBar";
 import ProfileManager from "@/components/imposition/ProfileManager";
 import ConfigPanel from "@/components/imposition/ConfigPanel";
 import { useProfiles } from "@/hooks/useProfiles";
+import { useAppPreferences } from "@/hooks/useAppPreferences";
+import { useImpositionConfig, DEFAULT_MARKS } from "@/hooks/useImpositionConfig";
 import MarksConfigTable from "@/components/imposition/MarksConfigTable";
 import SummaryPanel from "@/components/imposition/SummaryPanel";
 import SignatureCard from "@/components/imposition/SignatureCard";
@@ -22,54 +23,30 @@ import CreepChart from "@/components/imposition/CreepChart";
 import FlowDiagram from "@/components/imposition/FlowDiagram";
 import PreviewPanel from "@/components/imposition/PreviewPanel";
 
-const DEFAULT_CONFIG = {
-  name: "",
-  totalPages: 128,
-  pageSize: "A5",
-  customWidth: 148,
-  customHeight: 210,
-  bindingMethod: "sewn",
-  pagesPerSignature: 16,
-  paperThickness: 0.1,
-  creepFactor: 0.8,
-  blankPagesStart: 0,
-  blankPagesEnd: 0,
-  printSides: "double",
-  pageFormat: "quarto",
-  alternatePage: false,
-  signatureMode: "standard",
-  sheetsPerSig: 2,
-};
-
-const DEFAULT_MARKS = Object.fromEntries(
-  Object.entries(TECHNICAL_MARKS).map(([key, mark]) => [key, mark.defaultEnabled])
-);
-
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
-  const [config, setConfig] = useState(DEFAULT_CONFIG);
-  const [marksConfig, setMarksConfig] = useState(DEFAULT_MARKS);
+  const { config, setConfig, marksConfig, setMarksConfig, resetConfig } = useImpositionConfig();
+  const { prefs, update: updatePref, toggle: togglePref } = useAppPreferences();
+  const { dyslexicFont, focusMode, highContrast, textScale } = prefs;
   const [activeTab, setActiveTab] = useState("signatures");
   const [pdfFile, setPdfFile] = useState(null);
-  const { profiles, save: saveProfile, remove: removeProfile } = useProfiles();
-  const [dyslexicFont, setDyslexicFont] = useState(false);
-  const [focusMode, setFocusMode] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
   const [focusStep, setFocusStep] = useState(0);
-  const [textScale, setTextScale] = useState(1.0);
+  const { profiles, save: saveProfile, remove: removeProfile } = useProfiles();
+
+  const setTextScale = (fn) => updatePref("textScale", typeof fn === "function" ? fn(textScale) : fn);
 
   // Navegación por teclado: atajos globales
   useEffect(() => {
     const handler = (e) => {
-      if (e.altKey && e.key === "+") { e.preventDefault(); setTextScale(v => Math.min(1.5, +(v + 0.1).toFixed(1))); }
-      if (e.altKey && e.key === "-") { e.preventDefault(); setTextScale(v => Math.max(0.8, +(v - 0.1).toFixed(1))); }
-      if (e.altKey && e.key === "d") { e.preventDefault(); setDyslexicFont(v => !v); }
-      if (e.altKey && e.key === "f") { e.preventDefault(); setFocusMode(v => !v); }
-      if (e.altKey && e.key === "c") { e.preventDefault(); setHighContrast(v => !v); }
+      if (e.altKey && e.key === "+") { e.preventDefault(); updatePref("textScale", Math.min(1.5, +(textScale + 0.1).toFixed(1))); }
+      if (e.altKey && e.key === "-") { e.preventDefault(); updatePref("textScale", Math.max(0.8, +(textScale - 0.1).toFixed(1))); }
+      if (e.altKey && e.key === "d") { e.preventDefault(); togglePref("dyslexicFont"); }
+      if (e.altKey && e.key === "f") { e.preventDefault(); togglePref("focusMode"); }
+      if (e.altKey && e.key === "c") { e.preventDefault(); togglePref("highContrast"); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [textScale]);
 
   const imposition = useMemo(() => {
     if (config.totalPages < 4) return null;
@@ -93,8 +70,7 @@ export default function Home() {
     : PAGE_SIZES[config.pageSize];
 
   const handleReset = () => {
-    setConfig(DEFAULT_CONFIG);
-    setMarksConfig(DEFAULT_MARKS);
+    resetConfig();
     toast.success("Configuración reiniciada");
   };
 
@@ -135,12 +111,12 @@ export default function Home() {
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         onShowWelcome={() => setShowWelcome(true)}
-        dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)}
-        focusMode={focusMode} onToggleFocusMode={() => setFocusMode(v => !v)}
-        highContrast={highContrast} onToggleHighContrast={() => setHighContrast(v => !v)}
+        dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => togglePref("dyslexicFont")}
+        focusMode={focusMode} onToggleFocusMode={() => togglePref("focusMode")}
+        highContrast={highContrast} onToggleHighContrast={() => togglePref("highContrast")}
         textScale={textScale}
-        onTextScaleUp={() => setTextScale(v => Math.min(1.5, +(v + 0.1).toFixed(1)))}
-        onTextScaleDown={() => setTextScale(v => Math.max(0.8, +(v - 0.1).toFixed(1)))}
+        onTextScaleUp={() => updatePref("textScale", Math.min(1.5, +(textScale + 0.1).toFixed(1)))}
+        onTextScaleDown={() => updatePref("textScale", Math.max(0.8, +(textScale - 0.1).toFixed(1)))}
       />
 
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
