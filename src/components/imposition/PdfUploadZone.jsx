@@ -1,14 +1,26 @@
 import React, { useRef, useState } from "react";
-import { Upload, FileText, X, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Upload, X, CheckCircle2, Loader2 } from "lucide-react";
 
-export default function PdfUploadZone({ pdfFile, onPdfChange }) {
+async function getPdfPageCount(file) {
+  const pdfjsLib = await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs";
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  return pdf.numPages;
+}
+
+export default function PdfUploadZone({ pdfFile, onPdfChange, onPageCountDetected }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleFile = (file) => {
+  const handleFile = async (file) => {
     if (file && file.type === "application/pdf") {
       onPdfChange(file);
+      setLoading(true);
+      const count = await getPdfPageCount(file);
+      setLoading(false);
+      if (onPageCountDetected) onPageCountDetected(count);
     }
   };
 
@@ -40,8 +52,12 @@ export default function PdfUploadZone({ pdfFile, onPdfChange }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{pdfFile.name}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              {(pdfFile.size / 1024 / 1024).toFixed(2)} MB · PDF listo para imposición
+            <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+              {(pdfFile.size / 1024 / 1024).toFixed(2)} MB
+              {loading
+                ? <><Loader2 className="w-3 h-3 animate-spin inline ml-1" /> Contando páginas…</>
+                : " · PDF listo para imposición"
+              }
             </p>
           </div>
           <button

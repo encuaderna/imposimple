@@ -72,7 +72,7 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <PdfUploadZone pdfFile={pdfFile} onPdfChange={onPdfChange} />
+          <PdfUploadZone pdfFile={pdfFile} onPdfChange={onPdfChange} onPageCountDetected={(n) => onConfigChange({ ...config, totalPages: n })} />
           <EduNote>
             Aquí subes el libro o documento que quieres imprimir. El sistema lo va a dividir automáticamente en cuadernillos numerados (1, 2, 3…) listos para doblar y coser.
           </EduNote>
