@@ -176,6 +176,7 @@ export default function Home() {
               config={config} onConfigChange={setConfig}
               pdfFile={pdfFile} onPdfChange={setPdfFile}
               focusMode={focusMode} focusStep={focusStep} onFocusStepChange={setFocusStep}
+              imposition={imposition} marksConfig={marksConfig}
             />
             {!focusMode && <MarksConfigTable marksConfig={marksConfig} onMarksChange={setMarksConfig} />}
           </aside>

@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import PdfUploadZone from "@/components/imposition/PdfUploadZone";
 import PaperAdvisor from "@/components/imposition/PaperAdvisor";
 import PaperPresetsPanel from "@/components/imposition/PaperPresetsPanel";
+import RealtimeImpositionPreview from "@/components/imposition/RealtimeImpositionPreview";
 
 /** Burbuja de ayuda con ícono "i" azul visible */
 function InfoTip({ text }) {
@@ -42,7 +43,7 @@ function EduNote({ children }) {
 const SECTIONS = ["pdf", "documento", "impresora", "tamaño", "pliego", "encuadernacion", "papel", "creep"];
 const SECTION_LABELS = ["PDF", "Documento", "Impresora", "Tamaño", "Pliego", "Encuadernación", "Mis papeles", "Creep"];
 
-export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChange, focusMode, focusStep, onFocusStepChange }) {
+export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChange, focusMode, focusStep, onFocusStepChange, imposition, marksConfig }) {
   const update = (key, value) => onConfigChange({ ...config, [key]: value });
 
   const fmt = PAGE_FORMATS[config.pageFormat || "quarto"];
@@ -344,6 +345,15 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
         <PaperPresetsPanel
           currentThickness={config.paperThickness}
           onApply={(t) => update("paperThickness", t)}
+        />
+      )}
+
+      {/* Vista previa en tiempo real (siempre visible cuando hay imposición) */}
+      {imposition && marksConfig && !focusMode && (
+        <RealtimeImpositionPreview
+          config={config}
+          imposition={imposition}
+          marksConfig={marksConfig}
         />
       )}
 
