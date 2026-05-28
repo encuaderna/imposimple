@@ -1,10 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles } from "lucide-react";
+import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function AppHeader({
-  onReset, onExport, hasImposition,
+  onReset, onExport, onExportSpecSheet, hasImposition,
   dyslexicFont, onToggleDyslexicFont,
   focusMode, onToggleFocusMode,
   highContrast, onToggleHighContrast,
@@ -91,10 +91,16 @@ export default function AppHeader({
           </Button>
 
           {hasImposition && (
-            <Button size="sm" onClick={onExport} className="text-xs gap-1.5 rounded-xl shadow-sm">
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Exportar</span>
-            </Button>
+            <>
+              <Button variant="outline" size="sm" onClick={onExportSpecSheet} className="text-xs gap-1.5 rounded-xl shadow-sm border-primary/40 text-primary hover:bg-primary/10">
+                <FileText className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Hoja de especificaciones</span>
+              </Button>
+              <Button size="sm" onClick={onExport} className="text-xs gap-1.5 rounded-xl shadow-sm">
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Exportar JSON</span>
+              </Button>
+            </>
           )}
         </div>
       </div>

@@ -9,6 +9,7 @@ import {
   getImpositionSummary,
   PAGE_SIZES,
 } from "@/lib/imposition-engine";
+import { generateSpecSheetPDF } from "@/lib/spec-sheet-pdf";
 import AppHeader from "@/components/imposition/AppHeader";
 import ProgressBar from "@/components/imposition/ProgressBar";
 import ProfileManager from "@/components/imposition/ProfileManager";
@@ -74,6 +75,12 @@ export default function Home() {
     toast.success("Configuración reiniciada");
   };
 
+  const handleExportSpecSheet = () => {
+    if (!imposition || !summary) return;
+    generateSpecSheetPDF({ config, imposition, summary, marksConfig });
+    toast.success("Hoja de especificaciones exportada");
+  };
+
   const handleExport = () => {
     const data = {
       config,
@@ -111,6 +118,7 @@ export default function Home() {
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         onShowWelcome={() => setShowWelcome(true)}
+        onExportSpecSheet={handleExportSpecSheet}
         dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => togglePref("dyslexicFont")}
         focusMode={focusMode} onToggleFocusMode={() => togglePref("focusMode")}
         highContrast={highContrast} onToggleHighContrast={() => togglePref("highContrast")}
