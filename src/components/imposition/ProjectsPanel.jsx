@@ -10,9 +10,10 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  FolderOpen, MoreVertical, Trash2, Copy, Download, Upload, Plus, Calendar, Settings, Search,
+  FolderOpen, MoreVertical, Trash2, Copy, Download, Upload, Plus, Calendar, Settings, Search, Lock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,37 +33,58 @@ export default function ProjectsPanel({
   const [showRenameDialog, setShowRenameDialog] = useState(false);
   const [renamingProjectId, setRenamingProjectId] = useState(null);
   const [newName, setNewName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   const filtered = projects.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSaveProject = (name) => {
+  const handleSaveProject = async (name) => {
     if (!name.trim()) {
       toast.error("El nombre del proyecto no puede estar vacío");
       return;
     }
-    onSaveCurrentProject(name);
-    setShowSaveDialog(false);
-    toast.success(`Proyecto "${name}" guardado`);
+    setSaving(true);
+    try {
+      await onSaveCurrentProject(name);
+      setShowSaveDialog(false);
+      toast.success(`Proyecto "${name}" guardado (privado)`);
+    } catch (e) {
+      toast.error("Error guardando proyecto");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleRename = (id, name) => {
+  const handleRename = async (id, name) => {
     if (!name.trim()) {
       toast.error("El nombre no puede estar vacío");
       return;
     }
-    onRenameProject(id, name);
-    setShowRenameDialog(false);
-    setRenamingProjectId(null);
-    setNewName("");
-    toast.success("Proyecto renombrado");
+    setSaving(true);
+    try {
+      await onRenameProject(id, name);
+      setShowRenameDialog(false);
+      setRenamingProjectId(null);
+      setNewName("");
+      toast.success("Proyecto renombrado");
+    } catch (e) {
+      toast.error("Error renombrando proyecto");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDuplicate = (id) => {
-    const newId = onDuplicateProject(id);
-    if (newId) {
+  const handleDuplicate = async (id) => {
+    setSaving(true);
+    try {
+      await onDuplicateProject(id);
       toast.success("Proyecto duplicado");
+    } catch (e) {
+      toast.error("Error duplicando proyecto");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -115,6 +137,14 @@ export default function ProjectsPanel({
               className="pl-8 h-8 text-xs bg-background/50"
             />
           </div>
+
+          {/* Indicador de privacidad */}
+          {projects.length > 0 && (
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-primary/10 border border-primary/20 rounded-lg text-[10px] text-primary">
+              <Lock className="w-3 h-3" />
+              <span>Solo tú ves tus proyectos</span>
+            </div>
+          )}
 
           {/* Lista de proyectos o estado vacío */}
           {projects.length === 0 ? (
@@ -201,6 +231,7 @@ export default function ProjectsPanel({
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDuplicate(project.id)}
+                            disabled={saving}
                             className="text-xs gap-2"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -214,10 +245,25 @@ export default function ProjectsPanel({
                             Exportar
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onDeleteProject(project.id)}
+                            onClick={async () => {
+                              setDeleting(project.id);
+                              try {
+                                await onDeleteProject(project.id);
+                                toast.success("Proyecto eliminado");
+                              } catch (e) {
+                                toast.error("Error eliminando proyecto");
+                              } finally {
+                                setDeleting(null);
+                              }
+                            }}
+                            disabled={deleting === project.id}
                             className="text-xs gap-2 text-destructive focus:text-destructive"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            {deleting === project.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
                             Eliminar
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -261,9 +307,17 @@ export default function ProjectsPanel({
             <Button
               size="sm"
               onClick={() => handleSaveProject(newName || currentProjectName)}
+              disabled={saving}
               className="text-xs rounded-xl"
             >
-              Guardar
+              {saving ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                  Guardando...
+                </>
+              ) : (
+                "Guardar"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -299,9 +353,17 @@ export default function ProjectsPanel({
             <Button
               size="sm"
               onClick={() => handleRename(renamingProjectId, newName)}
+              disabled={saving}
               className="text-xs rounded-xl"
             >
-              Renombrar
+              {saving ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                  Renombrando...
+                </>
+              ) : (
+                "Renombrar"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

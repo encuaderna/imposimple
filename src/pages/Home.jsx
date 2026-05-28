@@ -89,15 +89,18 @@ export default function Home() {
     toast.success("Configuración reiniciada");
   };
 
-  const handleSaveProject = (name) => {
-    saveProject(name, config, imposition, summary, marksConfig);
+  const handleSaveProject = async (name) => {
+    await saveProject(name, config, imposition, summary, marksConfig);
     setCurrentProjectName(name);
   };
 
   const handleLoadProject = (project) => {
-    setConfig(project.config);
-    setMarksConfig(project.marksConfig);
-    setCurrentProjectName(project.name);
+    const loaded = loadProject(project.id);
+    if (loaded) {
+      setConfig(loaded.config);
+      setMarksConfig(loaded.marksConfig);
+      setCurrentProjectName(project.name);
+    }
   };
 
   const handleExportSpecSheet = () => {
