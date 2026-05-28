@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Download, RotateCcw, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
 
-export default function AppHeader({ onReset, onExport, hasImposition }) {
+export default function AppHeader({ onReset, onExport, hasImposition, dyslexicFont, onToggleDyslexicFont }) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -20,6 +20,16 @@ export default function AppHeader({ onReset, onExport, hasImposition }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant={dyslexicFont ? "secondary" : "ghost"}
+            size="sm"
+            className="text-xs gap-1.5"
+            onClick={onToggleDyslexicFont}
+            title="Fuente para dislexia"
+          >
+            <span className="font-bold text-sm leading-none">Aa</span>
+            {dyslexicFont ? "Dislexia: ON" : "Dislexia"}
+          </Button>
           <Button
             variant="ghost"
             size="icon"

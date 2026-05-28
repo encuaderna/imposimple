@@ -46,6 +46,7 @@ export default function Home() {
   const [marksConfig, setMarksConfig] = useState(DEFAULT_MARKS);
   const [activeTab, setActiveTab] = useState("signatures");
   const [pdfFile, setPdfFile] = useState(null);
+  const [dyslexicFont, setDyslexicFont] = useState(false);
 
   const imposition = useMemo(() => {
     if (config.totalPages < 4) return null;
@@ -86,8 +87,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader onReset={handleReset} onExport={handleExport} hasImposition={!!imposition} />
+    <div className="min-h-screen bg-background" style={dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}}>
+      <AppHeader onReset={handleReset} onExport={handleExport} hasImposition={!!imposition} dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => setDyslexicFont(v => !v)} />
 
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
