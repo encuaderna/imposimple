@@ -12,7 +12,9 @@ import {
 } from "@/lib/imposition-engine";
 import AppHeader from "@/components/imposition/AppHeader";
 import ProgressBar from "@/components/imposition/ProgressBar";
+import ProfileManager from "@/components/imposition/ProfileManager";
 import ConfigPanel from "@/components/imposition/ConfigPanel";
+import { useProfiles } from "@/hooks/useProfiles";
 import MarksConfigTable from "@/components/imposition/MarksConfigTable";
 import SummaryPanel from "@/components/imposition/SummaryPanel";
 import SignatureCard from "@/components/imposition/SignatureCard";
@@ -49,6 +51,7 @@ export default function Home() {
   const [marksConfig, setMarksConfig] = useState(DEFAULT_MARKS);
   const [activeTab, setActiveTab] = useState("signatures");
   const [pdfFile, setPdfFile] = useState(null);
+  const { profiles, save: saveProfile, remove: removeProfile } = useProfiles();
   const [dyslexicFont, setDyslexicFont] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
@@ -147,6 +150,13 @@ export default function Home() {
 
           {/* Panel izquierdo: Configuración */}
           <aside className="lg:col-span-3 space-y-4">
+            <ProfileManager
+              config={config}
+              onLoad={(cfg) => setConfig({ ...cfg })}
+              profiles={profiles}
+              onSave={saveProfile}
+              onRemove={removeProfile}
+            />
             <ConfigPanel
               config={config} onConfigChange={setConfig}
               pdfFile={pdfFile} onPdfChange={setPdfFile}
