@@ -30,6 +30,11 @@ const DEFAULT_CONFIG = {
   creepFactor: 0.8,
   blankPagesStart: 0,
   blankPagesEnd: 0,
+  printSides: "double",
+  pageFormat: "quarto",
+  alternatePage: false,
+  signatureMode: "standard",
+  sheetsPerSig: 2,
 };
 
 const DEFAULT_MARKS = Object.fromEntries(

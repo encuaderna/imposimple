@@ -5,14 +5,32 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-import { PAGE_SIZES, BINDING_METHODS } from "@/lib/imposition-engine";
-import { Settings2, BookOpen, Ruler, Layers } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { PAGE_SIZES, BINDING_METHODS, PAGE_FORMATS } from "@/lib/imposition-engine";
+import { Settings2, BookOpen, Ruler, Layers, Printer, LayoutGrid, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+function InfoTip({ text }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help inline ml-1" />
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs text-xs">{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
 
 export default function ConfigPanel({ config, onConfigChange }) {
   const update = (key, value) => onConfigChange({ ...config, [key]: value });
 
+  const fmt = PAGE_FORMATS[config.pageFormat || "quarto"];
+
   return (
     <div className="space-y-4">
+
       {/* Documento */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
@@ -39,6 +57,43 @@ export default function ConfigPanel({ config, onConfigChange }) {
               value={config.totalPages || ""}
               onChange={(e) => update("totalPages", parseInt(e.target.value) || 0)}
               className="mt-1 bg-background/50 font-mono text-sm"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Impresora */}
+      <Card className="border-border/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+            <Printer className="w-4 h-4" />
+            Impresora
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-xs text-muted-foreground">Tipo de impresión</Label>
+            <Select value={config.printSides || "double"} onValueChange={(v) => update("printSides", v)}>
+              <SelectTrigger className="mt-1 bg-background/50 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="double">Doble cara (dúplex)</SelectItem>
+                <SelectItem value="single">Una cara (símplex)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between py-1">
+            <div className="flex-1">
+              <Label className="text-xs font-medium">Rotación alterna
+                <InfoTip text="También conocida como «girar por el lado largo». Las hojas impares se rotan 180° para que al plegar el cuadernillo las páginas queden orientadas correctamente." />
+              </Label>
+              <p className="text-[10px] text-muted-foreground">Girar por el lado largo</p>
+            </div>
+            <Switch
+              checked={config.alternatePage || false}
+              onCheckedChange={(v) => update("alternatePage", v)}
             />
           </div>
         </CardContent>
@@ -80,6 +135,89 @@ export default function ConfigPanel({ config, onConfigChange }) {
         </CardContent>
       </Card>
 
+      {/* Formato de pliego */}
+      <Card className="border-border/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+            <LayoutGrid className="w-4 h-4" />
+            Formato de pliego
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-xs text-muted-foreground">Formato de imposición</Label>
+            <Select value={config.pageFormat || "quarto"} onValueChange={(v) => update("pageFormat", v)}>
+              <SelectTrigger className="mt-1 bg-background/50 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(PAGE_FORMATS).map(([key, f]) => (
+                  <SelectItem key={key} value={key} className="text-sm">{f.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              {fmt.pagesPerSheet} págs/hoja · {fmt.defaultSheetsPerSig} hoja(s) recomendada(s)/cuadernillo
+            </p>
+          </div>
+
+          <Separator className="opacity-50" />
+
+          {/* Modo de pliegos */}
+          <div>
+            <Label className="text-xs text-muted-foreground">
+              Modo de pliegos
+              <InfoTip text="Pliegos estándar usa los controles de páginas por cuadernillo. Pliegos personalizados te permite definir exactamente cuántas hojas físicas tiene cada plica." />
+            </Label>
+            <Select value={config.signatureMode || "standard"} onValueChange={(v) => update("signatureMode", v)}>
+              <SelectTrigger className="mt-1 bg-background/50 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="standard">Pliegos estándar — longitud</SelectItem>
+                <SelectItem value="custom">Pliegos personalizados</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {config.signatureMode !== "custom" ? (
+            <div>
+              <Label className="text-xs text-muted-foreground">Páginas por cuadernillo</Label>
+              <Select value={String(config.pagesPerSignature)} onValueChange={(v) => update("pagesPerSignature", parseInt(v))}>
+                <SelectTrigger className="mt-1 bg-background/50 font-mono text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[8, 16, 32].map((n) => (
+                    <SelectItem key={n} value={String(n)} className="font-mono text-sm">
+                      {n} páginas ({n / 4} hojas)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div>
+              <Label className="text-xs text-muted-foreground">
+                Hojas por plica
+                <InfoTip text="La longitud de un pliego es el número de hojas físicas por cuadernillo. Para folio: cada hoja = 1 pliegue. Cuarto: 2 pliegues/hoja. Octavo: 4 pliegues/hoja. Se recomienda no más de 1 hoja para octavo." />
+              </Label>
+              <Input
+                type="number"
+                min={1}
+                max={16}
+                value={config.sheetsPerSig || fmt.defaultSheetsPerSig}
+                onChange={(e) => update("sheetsPerSig", parseInt(e.target.value) || 1)}
+                className="mt-1 bg-background/50 font-mono text-sm"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                = {(config.sheetsPerSig || fmt.defaultSheetsPerSig) * fmt.pagesPerSheet} páginas por cuadernillo
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Encuadernación */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
@@ -101,24 +239,10 @@ export default function ConfigPanel({ config, onConfigChange }) {
               ))}
             </SelectContent>
           </Select>
-
-          <div>
-            <Label className="text-xs text-muted-foreground">Páginas por cuadernillo</Label>
-            <Select value={String(config.pagesPerSignature)} onValueChange={(v) => update("pagesPerSignature", parseInt(v))}>
-              <SelectTrigger className="mt-1 bg-background/50 font-mono text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[8, 16, 32].map((n) => (
-                  <SelectItem key={n} value={String(n)} className="font-mono text-sm">{n} páginas ({n / 4} hojas)</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardContent>
       </Card>
 
-      {/* Parámetros de Creep */}
+      {/* Compensación de Creep */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
@@ -173,6 +297,7 @@ export default function ConfigPanel({ config, onConfigChange }) {
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 }

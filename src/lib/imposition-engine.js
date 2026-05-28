@@ -6,54 +6,57 @@
 
 // ── Constantes de tamaños de página (en mm) ──
 export const PAGE_SIZES = {
-  A4: { width: 210, height: 297, label: "A4 (210×297 mm)" },
-  A5: { width: 148, height: 210, label: "A5 (148×210 mm)" },
-  Letter: { width: 216, height: 279, label: "Letter (216×279 mm)" },
-  "Half-Letter": { width: 140, height: 216, label: "Half-Letter (140×216 mm)" },
-  B5: { width: 176, height: 250, label: "B5 (176×250 mm)" },
-  "Crown Quarto": { width: 189, height: 246, label: "Crown Quarto (189×246 mm)" },
-  "Royal": { width: 156, height: 234, label: "Royal (156×234 mm)" },
-  Custom: { width: 0, height: 0, label: "Personalizado" },
+  A4:             { width: 210,   height: 297,   label: "A4 (210×297 mm)" },
+  A5:             { width: 148,   height: 210,   label: "A5 (148×210 mm)" },
+  Letter:         { width: 216,   height: 279,   label: "Letter US (216×279 mm)" },
+  "Half-Letter":  { width: 140,   height: 216,   label: "Half-Letter (140×216 mm)" },
+  "Carta-CL":     { width: 216,   height: 279,   label: "Carta chilena (216×279 mm)" },
+  "Oficio-CL":    { width: 216,   height: 330,   label: "Oficio chileno (216×330 mm)" },
+  B5:             { width: 176,   height: 250,   label: "B5 (176×250 mm)" },
+  "Crown Quarto": { width: 189,   height: 246,   label: "Crown Quarto (189×246 mm)" },
+  "Royal":        { width: 156,   height: 234,   label: "Royal (156×234 mm)" },
+  Custom:         { width: 0,     height: 0,     label: "Personalizado" },
+};
+
+// ── Formatos de pliego (imposición clásica) ──
+// Folio = 2 páginas por cara de hoja → 4 págs/hoja (2 hojas por plica mínima)
+// Cuarto = 4 páginas por cara → 8 págs/hoja
+// Octavo = 8 páginas por cara → 16 págs/hoja
+export const PAGE_FORMATS = {
+  folio:  { label: "Folio (2 páginas/cara)",  pagesPerSheet: 4,  defaultSheetsPerSig: 4 },
+  quarto: { label: "Cuarto (4 páginas/cara)", pagesPerSheet: 8,  defaultSheetsPerSig: 2 },
+  octavo: { label: "Octavo (8 páginas/cara)", pagesPerSheet: 16, defaultSheetsPerSig: 1 },
 };
 
 // ── Métodos de encuadernación ──
 export const BINDING_METHODS = {
-  saddle_stitch: { label: "Costura a caballete", maxPages: 96, pagesPerSignature: null },
-  perfect_bind: { label: "Encuadernación perfecta (Hot-melt)", maxPages: 600, pagesPerSignature: [8, 16, 32] },
-  sewn: { label: "Cosido (hilo vegetal)", maxPages: 400, pagesPerSignature: [8, 16, 32] },
-  section_sewn: { label: "Cosido por secciones", maxPages: 500, pagesPerSignature: [16, 32] },
+  saddle_stitch: { label: "Costura a caballete",               maxPages: 96,  pagesPerSignature: null },
+  perfect_bind:  { label: "Encuadernación perfecta (Hot-melt)", maxPages: 600, pagesPerSignature: [8, 16, 32] },
+  sewn:          { label: "Cosido (hilo vegetal)",              maxPages: 400, pagesPerSignature: [8, 16, 32] },
+  section_sewn:  { label: "Cosido por secciones",              maxPages: 500, pagesPerSignature: [16, 32] },
+  unsewn:        { label: "Sin costura (perfect bind estándar)", maxPages: 600, pagesPerSignature: [8, 16, 32] },
 };
 
 // ── Marcas técnicas disponibles ──
 export const TECHNICAL_MARKS = {
-  crop: { label: "Marcas de corte", description: "Líneas de corte en esquinas", defaultEnabled: true },
-  fold: { label: "Marcas de plegado", description: "Indicadores de línea de pliegue", defaultEnabled: true },
-  registration: { label: "Marcas de registro", description: "Cruces de registro para alineación", defaultEnabled: true },
-  collation: { label: "Marcas de alzado", description: "Barras escalonadas en lomo para verificar orden", defaultEnabled: true },
-  signature_id: { label: "Identificador de cuadernillo", description: "Número y nombre del cuadernillo", defaultEnabled: true },
-  sewing: { label: "Marcas de costura", description: "Puntos de perforación para cosido", defaultEnabled: false },
-  color_bar: { label: "Barra de color", description: "Barra de control de color CMYK", defaultEnabled: false },
-  bleed: { label: "Zona de sangrado", description: "Área de sangrado (3mm por defecto)", defaultEnabled: true },
+  crop:         { label: "Marcas de corte",           description: "Líneas de corte en esquinas",                       defaultEnabled: true  },
+  fold:         { label: "Marcas de plegado",          description: "Indicadores de línea de pliegue",                   defaultEnabled: true  },
+  registration: { label: "Marcas de registro",         description: "Cruces de registro para alineación",               defaultEnabled: true  },
+  collation:    { label: "Marcas de alzado",            description: "Barras escalonadas en lomo para verificar orden",  defaultEnabled: true  },
+  signature_id: { label: "Identificador de cuadernillo", description: "Número y nombre del cuadernillo",               defaultEnabled: true  },
+  sewing:       { label: "Marcas de costura",           description: "Puntos de perforación para cosido",               defaultEnabled: false },
+  color_bar:    { label: "Barra de color",              description: "Barra de control de color CMYK",                  defaultEnabled: false },
+  bleed:        { label: "Zona de sangrado",            description: "Área de sangrado (3 mm por defecto)",             defaultEnabled: true  },
 };
 
 /**
  * Calcula el creep (desplazamiento hacia el lomo) para cada hoja
- * de un cuadernillo basado en el grosor del papel.
- * 
- * Fórmula: creep_i = (N - i) × grosor_papel × factor_acumulación
- * donde:
- *   N = número total de hojas en el cuadernillo
- *   i = índice de la hoja (0 = exterior, N-1 = interior)
- *   grosor_papel = grosor en mm (típicamente 0.05-0.15 mm)
- *   factor_acumulación = factor de ajuste (típicamente 0.5-1.0)
+ * Fórmula: creep_i = (N - 1 - i) × grosor_papel × factor_acumulación
  */
 export function calculateCreep(sheetIndex, totalSheets, paperThickness, accumulationFactor = 0.8) {
   return (totalSheets - 1 - sheetIndex) * paperThickness * accumulationFactor;
 }
 
-/**
- * Calcula el total de creep para un cuadernillo completo
- */
 export function calculateTotalCreep(totalSheets, paperThickness, accumulationFactor = 0.8) {
   let total = 0;
   for (let i = 0; i < totalSheets; i++) {
@@ -63,7 +66,7 @@ export function calculateTotalCreep(totalSheets, paperThickness, accumulationFac
 }
 
 /**
- * Genera las páginas en blanco necesarias para completar un cuadernillo
+ * Rellena con blancos para completar el último cuadernillo
  */
 function padPages(totalPages, pagesPerSignature, blankStart = 0, blankEnd = 0) {
   const effectivePages = totalPages + blankStart + blankEnd;
@@ -77,8 +80,14 @@ function padPages(totalPages, pagesPerSignature, blankStart = 0, blankEnd = 0) {
 }
 
 /**
- * Genera la imposición completa del libro
- * Retorna un array de cuadernillos, cada uno con sus hojas y páginas asignadas
+ * Genera la imposición completa del libro.
+ *
+ * Nuevos parámetros en config:
+ *   printSides       "single" | "double"   — a una o doble cara
+ *   pageFormat       "folio" | "quarto" | "octavo"   — formato de pliego
+ *   alternatePage    boolean               — rotación alterna (girar por el lado largo)
+ *   signatureMode    "standard" | "custom" — pliegos estándar o personalizados
+ *   sheetsPerSig     number                — longitud personalizada de cuadernillo (hojas/plica)
  */
 export function calculateImposition(config) {
   const {
@@ -89,67 +98,79 @@ export function calculateImposition(config) {
     blankPagesStart = 0,
     blankPagesEnd = 0,
     bindingMethod = "sewn",
+    printSides = "double",
+    pageFormat = "quarto",
+    alternatePage = false,
+    signatureMode = "standard",
+    sheetsPerSig: customSheetsPerSig,
   } = config;
 
-  // Paso 1: Calcular páginas con blancos
-  const padding = padPages(totalPages, pagesPerSignature, blankPagesStart, blankPagesEnd);
+  // Determinar páginas por cuadernillo según el modo
+  const fmt = PAGE_FORMATS[pageFormat] || PAGE_FORMATS.quarto;
+
+  let resolvedPagesPerSig;
+  if (signatureMode === "custom" && customSheetsPerSig > 0) {
+    // El usuario define cuántas hojas por plica; páginas = hojas × páginas-por-hoja
+    resolvedPagesPerSig = customSheetsPerSig * fmt.pagesPerSheet;
+  } else {
+    // Modo estándar: usar el selector clásico de páginas/cuadernillo
+    resolvedPagesPerSig = pagesPerSignature;
+  }
+
+  // Para impresión a una cara: cada hoja solo aporta la mitad de páginas visibles
+  const effectivePagesPerSheet = printSides === "single" ? fmt.pagesPerSheet / 2 : fmt.pagesPerSheet;
+  const adjustedPagesPerSig = printSides === "single"
+    ? Math.max(4, Math.floor(resolvedPagesPerSig / 2))
+    : resolvedPagesPerSig;
+
+  // Paso 1: Páginas con blancos
+  const padding = padPages(totalPages, adjustedPagesPerSig, blankPagesStart, blankPagesEnd);
   const totalWithBlanks = padding.totalWithBlanks;
 
-  // Paso 2: Generar array de páginas
+  // Paso 2: Array de páginas
   const pages = [];
   for (let i = 0; i < totalWithBlanks; i++) {
     const pageNum = i - padding.blankStart + 1;
+    const isBlank = pageNum < 1 || pageNum > totalPages;
     pages.push({
       index: i,
       pageNumber: pageNum,
-      isBlank: i < padding.blankStart || i >= (totalWithBlanks - padding.blankEnd + blankPagesEnd - (padding.blankEnd - blankPagesEnd)),
-      label: pageNum < 1 || pageNum > totalPages ? "BLANCO" : `${pageNum}`,
+      isBlank,
+      label: isBlank ? "BLANCO" : `${pageNum}`,
     });
   }
 
-  // Simplificar la lógica de blancos
-  for (let i = 0; i < pages.length; i++) {
-    const pn = pages[i].pageNumber;
-    pages[i].isBlank = pn < 1 || pn > totalPages;
-    pages[i].label = pages[i].isBlank ? "BLANCO" : `${pn}`;
-  }
-
-  // Paso 3: Dividir en cuadernillos
-  const numSignatures = totalWithBlanks / pagesPerSignature;
+  // Paso 3: Cuadernillos
+  const numSignatures = Math.ceil(totalWithBlanks / adjustedPagesPerSig);
+  const sheetsPerSignature = adjustedPagesPerSig / 4;
   const signatures = [];
 
   for (let sig = 0; sig < numSignatures; sig++) {
-    const sigPages = pages.slice(sig * pagesPerSignature, (sig + 1) * pagesPerSignature);
-    const sheetsPerSignature = pagesPerSignature / 4; // Cada hoja tiene 4 páginas (frente y dorso, 2 caras)
+    const sigPages = pages.slice(sig * adjustedPagesPerSig, (sig + 1) * adjustedPagesPerSig);
     const sheets = [];
 
     for (let sheet = 0; sheet < sheetsPerSignature; sheet++) {
-      // Lógica de imposición: las páginas se emparejan de fuera hacia dentro
-      // Hoja exterior: primera y última página del cuadernillo
-      // Frente: [última, primera] | Dorso: [segunda, penúltima]
-      const frontLeft = sigPages[pagesPerSignature - 1 - (sheet * 2)];
+      const frontLeft  = sigPages[adjustedPagesPerSig - 1 - sheet * 2];
       const frontRight = sigPages[sheet * 2];
-      const backLeft = sigPages[sheet * 2 + 1];
-      const backRight = sigPages[pagesPerSignature - 2 - (sheet * 2)];
+      const backLeft   = sigPages[sheet * 2 + 1];
+      const backRight  = sigPages[adjustedPagesPerSig - 2 - sheet * 2];
 
       const creepValue = calculateCreep(sheet, sheetsPerSignature, paperThickness, creepFactor);
+
+      // Rotación alterna: las hojas impares se marcan para rotar 180° (girar por el lado largo)
+      const rotated = alternatePage && sheet % 2 === 1;
 
       sheets.push({
         sheetIndex: sheet,
         creep: Math.round(creepValue * 1000) / 1000,
-        front: {
-          left: frontLeft,
-          right: frontRight,
-        },
-        back: {
-          left: backLeft,
-          right: backRight,
-        },
+        rotated,
+        printSides,
+        front: { left: frontLeft, right: frontRight },
+        back: printSides === "double" ? { left: backLeft, right: backRight } : null,
       });
     }
 
-    // Marca de alzado: posición escalonada para verificar orden
-    const collationOffset = sig * 4; // mm desde la parte superior del lomo
+    const collationOffset = sig * 4;
 
     signatures.push({
       signatureIndex: sig,
@@ -159,27 +180,35 @@ export function calculateImposition(config) {
       totalCreep: calculateTotalCreep(sheetsPerSignature, paperThickness, creepFactor),
       collationOffset,
       pageRange: {
-        first: sigPages[0].label,
-        last: sigPages[sigPages.length - 1].label,
+        first: sigPages[0]?.label ?? "—",
+        last:  sigPages[sigPages.length - 1]?.label ?? "—",
       },
+      pageFormat,
+      printSides,
+      alternatePage,
     });
   }
 
   return {
-    config: { ...config, totalWithBlanks },
+    config: { ...config, totalWithBlanks, resolvedPagesPerSig: adjustedPagesPerSig },
     padding,
     signatures,
     totalSignatures: numSignatures,
-    totalSheets: numSignatures * (pagesPerSignature / 4),
+    totalSheets: numSignatures * sheetsPerSignature,
+    sheetsPerSignature,
+    pageFormat,
+    printSides,
+    alternatePage,
   };
 }
 
 /**
- * Genera un resumen estadístico de la imposición
+ * Resumen estadístico de la imposición
  */
 export function getImpositionSummary(imposition) {
   const { signatures, config, padding } = imposition;
   const totalCreep = signatures.reduce((sum, sig) => sum + sig.totalCreep, 0);
+  const pps = config.resolvedPagesPerSig || config.pagesPerSignature;
 
   return {
     totalPages: config.totalPages,
@@ -188,10 +217,13 @@ export function getImpositionSummary(imposition) {
     blankStart: padding.blankStart,
     blankEnd: padding.blankEnd,
     totalSignatures: signatures.length,
-    pagesPerSignature: config.pagesPerSignature,
-    sheetsPerSignature: config.pagesPerSignature / 4,
+    pagesPerSignature: pps,
+    sheetsPerSignature: pps / 4,
     totalSheets: imposition.totalSheets,
     totalCreepMm: Math.round(totalCreep * 100) / 100,
-    avgCreepPerSheet: Math.round((totalCreep / imposition.totalSheets) * 1000) / 1000,
+    avgCreepPerSheet: Math.round((totalCreep / Math.max(1, imposition.totalSheets)) * 1000) / 1000,
+    pageFormat: imposition.pageFormat,
+    printSides: imposition.printSides,
+    alternatePage: imposition.alternatePage,
   };
 }
