@@ -45,6 +45,7 @@ export default function Home() {
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [marksConfig, setMarksConfig] = useState(DEFAULT_MARKS);
   const [activeTab, setActiveTab] = useState("signatures");
+  const [pdfFile, setPdfFile] = useState(null);
 
   const imposition = useMemo(() => {
     if (config.totalPages < 4) return null;
@@ -93,7 +94,7 @@ export default function Home() {
 
           {/* Panel izquierdo: Configuración */}
           <aside className="lg:col-span-3 space-y-4">
-            <ConfigPanel config={config} onConfigChange={setConfig} />
+            <ConfigPanel config={config} onConfigChange={setConfig} pdfFile={pdfFile} onPdfChange={setPdfFile} />
             <MarksConfigTable marksConfig={marksConfig} onMarksChange={setMarksConfig} />
           </aside>
 
@@ -109,16 +110,28 @@ export default function Home() {
               </div>
             )}
 
-            {/* Botón de calcular si no hay datos */}
+            {/* Estado vacío */}
             {!imposition && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
                   <Calculator className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <h2 className="text-lg font-semibold">Configura tu proyecto</h2>
-                <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-                  Ingresa al menos 4 páginas en el panel de configuración para generar la imposición.
+                <h2 className="text-lg font-semibold">¿Cómo funciona esto?</h2>
+                <p className="text-sm text-muted-foreground mt-2 max-w-sm leading-relaxed">
+                  Sube tu PDF y configura los parámetros en el panel izquierdo. El sistema calculará automáticamente cómo dividir tu libro en <strong>cuadernillos numerados</strong> (1, 2, 3…) listos para imprimir, doblar y encuadernar.
                 </p>
+                <div className="mt-6 grid grid-cols-3 gap-4 max-w-sm text-center">
+                  {[
+                    { n: "1", label: "Sube el PDF" },
+                    { n: "2", label: "Configura los parámetros" },
+                    { n: "3", label: "Exporta los cuadernillos" },
+                  ].map(({ n, label }) => (
+                    <div key={n} className="flex flex-col items-center gap-1">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center border border-primary/20">{n}</div>
+                      <p className="text-[11px] text-muted-foreground leading-tight">{label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
