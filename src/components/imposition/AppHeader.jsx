@@ -1,8 +1,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Download, RotateCcw } from "lucide-react";
+import { BookOpen, Download, RotateCcw, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function AppHeader({ onReset, onExport, hasImposition }) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-30">
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
@@ -17,6 +20,15 @@ export default function AppHeader({ onReset, onExport, hasImposition }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            <Sun className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
           <Button variant="ghost" size="sm" onClick={onReset} className="text-xs gap-1.5">
             <RotateCcw className="w-3.5 h-3.5" />
             Reiniciar
