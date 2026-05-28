@@ -24,6 +24,7 @@ import SignatureCard from "@/components/imposition/SignatureCard";
 import CreepChart from "@/components/imposition/CreepChart";
 import FlowDiagram from "@/components/imposition/FlowDiagram";
 import PreviewPanel from "@/components/imposition/PreviewPanel";
+import AdvancedExportModal from "@/components/imposition/AdvancedExportModal";
 
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -83,13 +84,19 @@ export default function Home() {
   };
 
   const [exportingPrepress, setExportingPrepress] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
-  const handleExportPrepress = async () => {
+  const handleExportPrepress = () => {
     if (!imposition || !summary) return;
+    setShowExportModal(true);
+  };
+
+  const handleConfirmExport = async (exportOptions) => {
     setExportingPrepress(true);
     try {
-      const filename = await generatePrepressPDF({ config, imposition, summary, marksConfig });
+      const filename = await generatePrepressPDF({ config, imposition, summary, marksConfig, exportOptions });
       toast.success(`PDF de preimpresión exportado: ${filename}`);
+      setShowExportModal(false);
     } finally {
       setExportingPrepress(false);
     }
@@ -129,6 +136,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
+      <AdvancedExportModal
+        open={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleConfirmExport}
+        exporting={exportingPrepress}
+        marksConfig={marksConfig}
+      />
+
       <AppHeader
         onReset={handleReset} onExport={handleExport} hasImposition={!!imposition}
         onShowWelcome={() => setShowWelcome(true)}

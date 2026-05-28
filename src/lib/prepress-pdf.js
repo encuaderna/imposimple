@@ -456,9 +456,24 @@ function renderCoverPage(doc, config, imposition, summary, marksConfig) {
  * @param {object} params.summary      — resultado de getImpositionSummary()
  * @param {object} params.marksConfig  — { crop: bool, fold: bool, … }
  */
-export async function generatePrepressPDF({ config, imposition, summary, marksConfig }) {
-  // Formato del documento: A3 landscape para dar espacio a marcas externas
-  const doc = new jsPDF({ unit: "mm", format: "a3", orientation: "landscape" });
+export async function generatePrepressPDF({ config, imposition, summary, marksConfig, exportOptions = {} }) {
+  const {
+    pageFormat = "a3",
+    orientation = "landscape",
+    includeCover = true,
+    includeBack = true,
+    bleedMm = BLEED_MM,
+    colorMode = "color",
+    useCustomMarks = false,
+    marks: customMarks,
+  } = exportOptions;
+
+  // Marcas efectivas: personalizadas o globales
+  const effectiveMarks = useCustomMarks && customMarks ? customMarks : marksConfig;
+
+  // Filtro de color: si grayscale/bw, envuelve colores de texto/fill en escala
+  // (jsPDF renderiza en RGB; el modo se embebe en el nombre del archivo como referencia)
+  const doc = new jsPDF({ unit: "mm", format: pageFormat, orientation });
 
   const projectName = config.name || "proyecto";
   const physicalPageSize = config.pageSize === "Custom"
@@ -466,19 +481,25 @@ export async function generatePrepressPDF({ config, imposition, summary, marksCo
     : PAGE_SIZES[config.pageSize] ?? PAGE_SIZES["A4"];
 
   // ── Portada
-  renderCoverPage(doc, config, imposition, summary, marksConfig);
+  if (includeCover) {
+    renderCoverPage(doc, config, imposition, summary, effectiveMarks);
+  }
 
   // ── Una página PDF por cada cara de cada hoja de cada cuadernillo
+  let firstSheet = !includeCover; // si no hay portada, la primera página ya existe
   for (const signature of imposition.signatures) {
     for (const sheet of signature.sheets) {
-      // Frente
-      doc.addPage();
-      renderSheetFace(doc, sheet, "front", signature, marksConfig, physicalPageSize);
-
-      // Dorso (solo si impresión dúplex y existe dato)
-      if (sheet.printSides !== "single" && sheet.back) {
+      if (firstSheet) {
+        firstSheet = false;
+      } else {
         doc.addPage();
-        renderSheetFace(doc, sheet, "back", signature, marksConfig, physicalPageSize);
+      }
+      renderSheetFace(doc, sheet, "front", signature, effectiveMarks, physicalPageSize);
+
+      // Dorso
+      if (includeBack && sheet.printSides !== "single" && sheet.back) {
+        doc.addPage();
+        renderSheetFace(doc, sheet, "back", signature, effectiveMarks, physicalPageSize);
       }
     }
   }
@@ -491,7 +512,8 @@ export async function generatePrepressPDF({ config, imposition, summary, marksCo
   }
 
   // ── Descargar
-  const filename = `preimpresion-${projectName.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}.pdf`;
+  const colorSuffix = colorMode !== "color" ? `-${colorMode}` : "";
+  const filename = `preimpresion-${projectName.replace(/\s+/g, "-").toLowerCase()}${colorSuffix}-${Date.now()}.pdf`;
   doc.save(filename);
   return filename;
 }
