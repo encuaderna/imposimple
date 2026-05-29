@@ -74,7 +74,7 @@ export default function AppHeader({
               </div>
             </SelectTrigger>
             <SelectContent className="text-xs">
-              <SelectItem value="normal">Visión Normal</SelectItem>
+              <SelectItem value="normal">Visión Estándar</SelectItem>
               <SelectItem value="protanopia">Protanopia (Rojo-Verde)</SelectItem>
               <SelectItem value="deuteranopia">Deuteranopia (Verde-Rojo)</SelectItem>
               <SelectItem value="tritanopia">Tritanopia (Azul-Amarillo)</SelectItem>
