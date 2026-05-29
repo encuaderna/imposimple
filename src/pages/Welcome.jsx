@@ -109,7 +109,7 @@ export default function Welcome({ onStart }) {
         Puedes cambiar las opciones de accesibilidad en cualquier momento desde la barra superior.
       </p>
 
-      <p className="text-xs text-muted-foreground/50 mt-8 italic">
+      <p className="text-xs text-muted-foreground/60 mt-3 italic">
         Dedicado a mi ahijada querida.
       </p>
     </div>
