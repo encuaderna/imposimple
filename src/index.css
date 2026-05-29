@@ -100,8 +100,18 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
+  
+  html {
+    overscroll-behavior: none;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
   body {
     @apply bg-background text-foreground font-sans;
+    overscroll-behavior: none;
   }
 }

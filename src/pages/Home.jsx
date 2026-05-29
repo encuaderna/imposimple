@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Welcome from "@/pages/Welcome";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { toast } from "sonner";
 import { Calculator, Eye, BarChart3, GitBranch, Layers, FileUp, SlidersHorizontal, BookCopy, Scissors, CheckCircle2 } from "lucide-react";
 import {
@@ -34,6 +36,7 @@ export default function Home() {
   const { prefs, update: updatePref, toggle: togglePref } = useAppPreferences();
   const { dyslexicFont, focusMode, highContrast, textScale, colorblindMode } = prefs;
   const [activeTab, setActiveTab] = useState("signatures");
+  const [mobileTab, setMobileTab] = useState("projects"); // projects | config | preview
   const [pdfFile, setPdfFile] = useState(null);
   const [focusStep, setFocusStep] = useState(0);
   const { profiles, save: saveProfile, remove: removeProfile } = useProfiles();
@@ -148,9 +151,19 @@ export default function Home() {
 
   if (showWelcome) {
     return (
-      <Welcome onStart={() => {
-        setShowWelcome(false);
-      }} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="welcome"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Welcome onStart={() => {
+            setShowWelcome(false);
+          }} />
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
@@ -222,10 +235,10 @@ export default function Home() {
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
         <ProgressBar currentStep={progressStep} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20 md:pb-6">
 
           {/* Panel izquierdo: Configuración */}
-          <aside className="lg:col-span-3 space-y-4">
+          <aside className={`lg:col-span-3 space-y-4 ${mobileTab !== "projects" && mobileTab !== "config" ? "hidden md:block" : ""} ${mobileTab !== "config" ? "hidden md:block" : ""}`}>
             <ProjectsPanel
               projects={projects}
               onLoadProject={handleLoadProject}
@@ -252,7 +265,7 @@ export default function Home() {
           </aside>
 
           {/* Panel principal: Resultados */}
-          <main className="lg:col-span-9 space-y-6">
+          <main className={`lg:col-span-9 space-y-6 ${mobileTab !== "preview" ? "hidden md:block" : ""}`}>
             {/* Resumen rápido */}
             {summary && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -353,6 +366,9 @@ export default function Home() {
           </main>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav activeTab={mobileTab} onTabChange={setMobileTab} />
     </div>
   );
 }

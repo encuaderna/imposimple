@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bookmark, Trash2, Download, Save } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Bookmark, Trash2, Download, Save, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { base44 } from "@/api/base44Client";
 
 export default function ProfileManager({ config, onLoad, profiles, onSave, onRemove }) {
   const [name, setName] = useState("");
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const handleSave = () => {
     const profileName = name.trim() || `Perfil ${new Date().toLocaleDateString("es")}`;
@@ -23,6 +27,32 @@ export default function ProfileManager({ config, onLoad, profiles, onSave, onRem
   const handleRemove = (profile) => {
     onRemove(profile.name);
     toast.success(`Perfil «${profile.name}» eliminado`);
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      // Delete account using base44 auth API
+      const response = await fetch("/api/delete-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        toast.success("Cuenta eliminada exitosamente");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
+      } else {
+        toast.error("Error eliminando la cuenta");
+      }
+    } catch (e) {
+      console.error("Error:", e);
+      toast.error("Error eliminando la cuenta");
+    } finally {
+      setDeletingAccount(false);
+      setShowDeleteAccount(false);
+    }
   };
 
   return (
@@ -76,7 +106,47 @@ export default function ProfileManager({ config, onLoad, profiles, onSave, onRem
             ))}
           </ul>
         )}
+
+        {/* Delete Account Section */}
+        <div className="pt-3 border-t border-border/30">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-xs gap-2 border-destructive/30 text-destructive hover:bg-destructive/10"
+            onClick={() => setShowDeleteAccount(true)}
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Eliminar cuenta
+          </Button>
+        </div>
       </CardContent>
+
+      {/* Delete Account Confirmation Dialog */}
+      <AlertDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogTitle className="text-base">¿Eliminar cuenta?</AlertDialogTitle>
+          <AlertDialogDescription className="text-xs leading-relaxed">
+            Esta acción es irreversible. Se eliminarán todos tus proyectos, perfiles y datos personales.
+          </AlertDialogDescription>
+          <div className="flex gap-2 justify-end pt-4">
+            <AlertDialogCancel className="text-xs">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={deletingAccount}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 text-xs gap-2"
+            >
+              {deletingAccount ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                "Eliminar"
+              )}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

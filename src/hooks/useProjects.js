@@ -63,24 +63,32 @@ export function useProjects() {
   };
 
   const deleteProject = async (id) => {
+    const previousProjects = projects;
     try {
-      await base44.entities.ImpositionProject.delete(id);
+      // Optimistic UI update
       setProjects((prev) => prev.filter((p) => p.id !== id));
+      await base44.entities.ImpositionProject.delete(id);
     } catch (e) {
+      // Rollback on error
+      setProjects(previousProjects);
       console.error("Error eliminando proyecto:", e);
       throw e;
     }
   };
 
   const renameProject = async (id, newName) => {
+    const previousProjects = projects;
     try {
-      await base44.entities.ImpositionProject.update(id, { name: newName });
+      // Optimistic UI update
       setProjects((prev) =>
         prev.map((p) =>
           p.id === id ? { ...p, name: newName } : p
         )
       );
+      await base44.entities.ImpositionProject.update(id, { name: newName });
     } catch (e) {
+      // Rollback on error
+      setProjects(previousProjects);
       console.error("Error renombrando proyecto:", e);
       throw e;
     }
