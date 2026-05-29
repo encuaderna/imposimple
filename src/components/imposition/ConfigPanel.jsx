@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { PAGE_SIZES, BINDING_METHODS, PAGE_FORMATS } from "@/lib/imposition-engine";
 import { Settings2, BookOpen, Ruler, Layers, Printer, LayoutGrid, Info, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 import PdfUploadZone from "@/components/imposition/PdfUploadZone";
 import PaperAdvisor from "@/components/imposition/PaperAdvisor";
 import PaperPresetsPanel from "@/components/imposition/PaperPresetsPanel";
@@ -47,6 +49,20 @@ const SECTION_LABELS = ["PDF", "Documento", "Impresora", "Tamaño", "Pliego", "E
 
 export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChange, focusMode, focusStep, onFocusStepChange, imposition, marksConfig }) {
   const update = (key, value) => onConfigChange({ ...config, [key]: value });
+  const [expandedSections, setExpandedSections] = React.useState({
+    pdf: true,
+    documento: true,
+    impresora: false,
+    tamaño: false,
+    pliego: false,
+    encuadernacion: false,
+    papel: false,
+    creep: false,
+  });
+
+  const toggleSection = (id) => {
+    setExpandedSections((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const fmt = PAGE_FORMATS[config.pageFormat || "quarto"];
 
@@ -84,29 +100,52 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
       )}
 
       {/* Subir PDF */}
-      {isVisible(0) && <Card className="border-primary/30 bg-primary/5">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2 text-primary uppercase tracking-wider">
-            <Upload className="w-4 h-4" />
-            1. Sube tu PDF
-          </CardTitle>
-        </CardHeader>
+      {isVisible(0) && (
+        <Collapsible open={expandedSections.pdf} onOpenChange={() => toggleSection("pdf")} className="space-y-0">
+          <Card className="border-primary/30 bg-primary/5 rounded-b-none">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="pb-3 cursor-pointer hover:bg-primary/10 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2 text-primary uppercase tracking-wider">
+                    <Upload className="w-4 h-4" />
+                    1. Sube tu PDF
+                  </CardTitle>
+                  <ChevronDown className={`w-4 h-4 text-primary transition-transform ${expandedSections.pdf ? "rotate-180" : ""}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+          </Card>
+          <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out">
+            <Card className="border-primary/30 bg-primary/5 rounded-t-none border-t-0">
         <CardContent className="space-y-2">
           <PdfUploadZone pdfFile={pdfFile} onPdfChange={onPdfChange} onPageCountDetected={(n) => onConfigChange({ ...config, totalPages: n })} />
-          <EduNote>
-            Aquí subes el libro o documento que quieres imprimir. El sistema lo va a dividir automáticamente en cuadernillos numerados (1, 2, 3…) listos para doblar y coser.
-          </EduNote>
-        </CardContent>
-      </Card>}
+              <EduNote>
+                Aquí subes el libro o documento que quieres imprimir. El sistema lo va a dividir automáticamente en cuadernillos numerados (1, 2, 3…) listos para doblar y coser.
+              </EduNote>
+            </CardContent>
+          </Card>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
       {/* Documento */}
-      {isVisible(1) && <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
-            <BookOpen className="w-4 h-4" />
-            2. Documento
-          </CardTitle>
-        </CardHeader>
+      {isVisible(1) && (
+        <Collapsible open={expandedSections.documento} onOpenChange={() => toggleSection("documento")} className="space-y-0">
+          <Card className="border-border/50 rounded-b-none">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="pb-3 cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+                    <BookOpen className="w-4 h-4" />
+                    2. Documento
+                  </CardTitle>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSections.documento ? "rotate-180" : ""}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+          </Card>
+          <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out">
+            <Card className="border-border/50 rounded-t-none border-t-0">
         <CardContent className="space-y-4">
           <div>
             <Label className="text-xs text-muted-foreground">Nombre del proyecto</Label>
@@ -132,9 +171,12 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
             <EduNote>
               ¿No sabes cuántas páginas tiene? Abre el PDF en tu computador y fíjate en el número de la última página.
             </EduNote>
-          </div>
-        </CardContent>
-      </Card>}
+            </div>
+            </CardContent>
+            </Card>
+            </CollapsibleContent>
+            </Collapsible>
+            )}
 
       {/* Impresora */}
       {isVisible(2) && <Card className="border-border/50">

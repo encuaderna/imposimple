@@ -235,10 +235,10 @@ export default function Home() {
       <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
         <ProgressBar currentStep={progressStep} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20 md:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 pb-20 md:pb-6">
 
-          {/* Panel izquierdo: Configuración */}
-          <aside className={`lg:col-span-3 space-y-4 ${mobileTab !== "projects" && mobileTab !== "config" ? "hidden md:block" : ""} ${mobileTab !== "config" ? "hidden md:block" : ""}`}>
+          {/* Panel izquierdo: Configuración (más amplio en desktop) */}
+          <aside className={`lg:col-span-3 space-y-4 overflow-y-auto ${mobileTab === "config" ? "block md:hidden" : "hidden md:block"}`}>
             <ProjectsPanel
               projects={projects}
               onLoadProject={handleLoadProject}
@@ -264,11 +264,11 @@ export default function Home() {
             {!focusMode && <MarksConfigTable marksConfig={marksConfig} onMarksChange={setMarksConfig} />}
           </aside>
 
-          {/* Panel principal: Resultados */}
-          <main className={`lg:col-span-9 space-y-6 ${mobileTab !== "preview" ? "hidden md:block" : ""}`}>
+          {/* Panel principal: Preview + Resumen (protagonista en móvil) */}
+          <main className={`lg:col-span-2 space-y-6 ${mobileTab !== "preview" ? "hidden md:block" : ""} md:block`}>
             {/* Resumen rápido */}
             {summary && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
                 <QuickStat label="Páginas" value={summary.totalWithBlanks} sub={`+${summary.blankPagesAdded} blancos`} colorIndex={0} />
                 <QuickStat label="Cuadernillos" value={summary.totalSignatures} sub={`${summary.pagesPerSignature} págs c/u`} colorIndex={1} />
                 <QuickStat label="Hojas totales" value={summary.totalSheets} sub={`${summary.sheetsPerSignature} por cuad.`} colorIndex={2} />
@@ -310,29 +310,29 @@ export default function Home() {
               </div>
             )}
 
-            {/* Tabs de resultados */}
+            {/* Tabs de resultados - compactos en desktop */}
             {imposition && (
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="bg-muted/50 p-1">
+                <TabsList className="bg-muted/50 p-1 grid grid-cols-2 lg:flex lg:flex-wrap">
                   <TabsTrigger value="signatures" className="gap-1.5 text-xs">
                     <Layers className="w-3.5 h-3.5" />
-                    Cuadernillos
+                    <span className="hidden lg:inline">Cuadernillos</span>
                   </TabsTrigger>
                   <TabsTrigger value="preview" className="gap-1.5 text-xs">
                     <Eye className="w-3.5 h-3.5" />
-                    Vista previa
+                    <span className="hidden lg:inline">Vista previa</span>
                   </TabsTrigger>
                   <TabsTrigger value="creep" className="gap-1.5 text-xs">
                     <BarChart3 className="w-3.5 h-3.5" />
-                    Análisis creep
+                    <span className="hidden lg:inline">Creep</span>
                   </TabsTrigger>
                   <TabsTrigger value="flow" className="gap-1.5 text-xs">
                     <GitBranch className="w-3.5 h-3.5" />
-                    Flujo
+                    <span className="hidden lg:inline">Flujo</span>
                   </TabsTrigger>
                   <TabsTrigger value="summary" className="gap-1.5 text-xs">
                     <Calculator className="w-3.5 h-3.5" />
-                    Resumen
+                    <span className="hidden lg:inline">Resumen</span>
                   </TabsTrigger>
                 </TabsList>
 
