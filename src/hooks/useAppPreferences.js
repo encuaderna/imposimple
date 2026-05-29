@@ -7,6 +7,7 @@ const DEFAULTS = {
   focusMode: false,
   highContrast: false,
   textScale: 1.0,
+  colorblindMode: "normal", // normal, protanopia, deuteranopia, tritanopia
 };
 
 function load() {

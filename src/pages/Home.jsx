@@ -32,7 +32,7 @@ export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
   const { config, setConfig, marksConfig, setMarksConfig, resetConfig } = useImpositionConfig();
   const { prefs, update: updatePref, toggle: togglePref } = useAppPreferences();
-  const { dyslexicFont, focusMode, highContrast, textScale } = prefs;
+  const { dyslexicFont, focusMode, highContrast, textScale, colorblindMode } = prefs;
   const [activeTab, setActiveTab] = useState("signatures");
   const [pdfFile, setPdfFile] = useState(null);
   const [focusStep, setFocusStep] = useState(0);
@@ -154,14 +154,48 @@ export default function Home() {
     );
   }
 
+  // Filtros de daltonismo
+  const colorblindFilters = {
+    normal: "",
+    protanopia: "url(#protanopia-filter)",
+    deuteranopia: "url(#deuteranopia-filter)",
+    tritanopia: "url(#tritanopia-filter)",
+  };
+
   const contrastStyle = highContrast ? {
     filter: "contrast(1.5) saturate(0.8)",
     background: "#000",
     color: "#fff",
-  } : {};
+  } : {
+    filter: colorblindFilters[colorblindMode],
+  };
 
   return (
     <div className="min-h-screen bg-background" style={{ ...(dyslexicFont ? { fontFamily: "'OpenDyslexic', sans-serif" } : {}), ...contrastStyle, fontSize: `${textScale}rem` }}>
+      {/* SVG filters para daltonismo */}
+      <svg style={{ display: "none" }}>
+        <defs>
+          <filter id="protanopia-filter">
+            <feColorMatrix type="matrix" values="0.567 0.433 0     0 0
+                                                 0.558 0.442 0     0 0
+                                                 0     0.242 0.758 0 0
+                                                 0     0     0     1 0" />
+          </filter>
+          <filter id="deuteranopia-filter">
+            <feColorMatrix type="matrix" values="0.625 0.375 0     0 0
+                                                 0.7   0.3   0     0 0
+                                                 0     0.3   0.7   0 0
+                                                 0     0     0     1 0" />
+          </filter>
+          <filter id="tritanopia-filter">
+            <feColorMatrix type="matrix" values="0.95  0.05  0     0 0
+                                                 0     0.433 0.567 0 0
+                                                 0     0.475 0.525 0 0
+                                                 0     0     0     1 0" />
+          </filter>
+        </defs>
+      </svg>
+
       <AdvancedExportModal
         open={showExportModal}
         onClose={() => setShowExportModal(false)}
@@ -179,6 +213,7 @@ export default function Home() {
         dyslexicFont={dyslexicFont} onToggleDyslexicFont={() => togglePref("dyslexicFont")}
         focusMode={focusMode} onToggleFocusMode={() => togglePref("focusMode")}
         highContrast={highContrast} onToggleHighContrast={() => togglePref("highContrast")}
+        colorblindMode={colorblindMode} onColorblindModeChange={(v) => updatePref("colorblindMode", v)}
         textScale={textScale}
         onTextScaleUp={() => updatePref("textScale", Math.min(1.5, +(textScale + 0.1).toFixed(1)))}
         onTextScaleDown={() => updatePref("textScale", Math.max(0.8, +(textScale - 0.1).toFixed(1)))}

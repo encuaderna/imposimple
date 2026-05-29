@@ -1,13 +1,15 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles, FileText, Printer, Loader2 } from "lucide-react";
+import { BookOpen, Download, RotateCcw, Sun, Moon, Focus, Contrast, ZoomIn, ZoomOut, Sparkles, FileText, Printer, Loader2, Eye } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function AppHeader({
   onReset, onExport, onExportSpecSheet, onExportPrepress, exportingPrepress, hasImposition,
   dyslexicFont, onToggleDyslexicFont,
   focusMode, onToggleFocusMode,
   highContrast, onToggleHighContrast,
+  colorblindMode, onColorblindModeChange,
   textScale, onTextScaleUp, onTextScaleDown,
   onShowWelcome,
 }) {
@@ -62,6 +64,22 @@ export default function AppHeader({
             <Contrast className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{highContrast ? "Contraste: ON" : "Contraste"}</span>
           </Button>
+
+          {/* Modo daltónico */}
+          <Select value={colorblindMode} onValueChange={onColorblindModeChange}>
+            <SelectTrigger className="h-8 w-32 text-xs rounded-xl border-border/40 bg-secondary/60">
+              <div className="flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5" />
+                <SelectValue />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="text-xs">
+              <SelectItem value="normal">Visión Normal</SelectItem>
+              <SelectItem value="protanopia">Protanopia (Rojo-Verde)</SelectItem>
+              <SelectItem value="deuteranopia">Deuteranopia (Verde-Rojo)</SelectItem>
+              <SelectItem value="tritanopia">Tritanopia (Azul-Amarillo)</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* Escalado de texto */}
           <div className="flex items-center gap-0 bg-secondary/60 border border-border/40 rounded-xl overflow-hidden">
