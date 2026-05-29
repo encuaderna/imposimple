@@ -112,6 +112,18 @@ export default function Welcome({ onStart }) {
       <p className="text-[11px] text-muted-foreground/60 mt-1.5 italic">
         Dedicado a mi ahijada querida.
       </p>
+
+      <div className="flex items-center gap-2 mt-3 text-[11px] text-muted-foreground/50">
+        <span>Otras apps:</span>
+        <a
+          href="https://bind-build-lab.base44.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary/60 hover:text-primary underline underline-offset-2 transition-colors"
+        >
+          EncuaTaller
+        </a>
+      </div>
     </div>
   );
 }
