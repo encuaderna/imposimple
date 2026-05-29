@@ -55,41 +55,41 @@ const FEATURES = [
 
 export default function Welcome({ onStart }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center px-4 py-6">
 
       {/* Logo + título */}
-      <div className="flex flex-col items-center gap-3 mb-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
-          <BookOpen className="w-8 h-8 text-primary-foreground" />
+      <div className="flex flex-col items-center gap-2 mb-4 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
+          <BookOpen className="w-6 h-6 text-primary-foreground" />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
           Imposición Editorial
         </h1>
-        <p className="text-base sm:text-lg text-muted-foreground max-w-lg leading-relaxed">
+        <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
           Convierte cualquier PDF en cuadernillos listos para imprimir y encuadernar,
           <strong className="text-foreground"> diseñado para que todas las personas puedan usarlo con comodidad.</strong>
         </p>
       </div>
 
       {/* Pill de accesibilidad */}
-      <div className="inline-flex items-center gap-2 bg-white/70 dark:bg-slate-800/70 border border-rose-200 dark:border-rose-800 rounded-full px-4 py-1.5 mb-10 shadow-sm">
-        <span className="text-rose-500 text-sm">♿</span>
-        <span className="text-sm font-medium text-rose-600 dark:text-rose-400">Herramientas de accesibilidad incluidas</span>
+      <div className="inline-flex items-center gap-2 bg-white/70 dark:bg-slate-800/70 border border-rose-200 dark:border-rose-800 rounded-full px-3 py-1 mb-4 shadow-sm">
+        <span className="text-rose-500 text-xs">♿</span>
+        <span className="text-xs font-medium text-rose-600 dark:text-rose-400">Herramientas de accesibilidad incluidas</span>
       </div>
 
       {/* Tarjetas de funciones */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-3xl mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-3xl mb-5">
         {FEATURES.map(({ icon: Icon, color, bg, border, title, desc }) => (
           <div
             key={title}
-            className={`flex gap-3 items-start p-4 rounded-2xl border ${bg} ${border} shadow-sm`}
+            className={`flex gap-2 items-start p-3 rounded-xl border ${bg} ${border} shadow-sm`}
           >
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${bg} border ${border}`}>
-              <Icon className={`w-5 h-5 ${color}`} />
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${bg} border ${border}`}>
+              <Icon className={`w-4 h-4 ${color}`} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground leading-tight">{title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{desc}</p>
+              <p className="text-xs font-semibold text-foreground leading-tight">{title}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{desc}</p>
             </div>
           </div>
         ))}
@@ -99,17 +99,17 @@ export default function Welcome({ onStart }) {
       <Button
         size="lg"
         onClick={onStart}
-        className="gap-2 text-base px-8 py-5 rounded-2xl shadow-md hover:shadow-lg transition-shadow"
+        className="gap-2 text-base px-8 py-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow"
       >
         Comenzar ahora
         <ArrowRight className="w-5 h-5" />
       </Button>
 
-      <p className="text-xs text-muted-foreground mt-4">
+      <p className="text-[11px] text-muted-foreground mt-2">
         Puedes cambiar las opciones de accesibilidad en cualquier momento desde la barra superior.
       </p>
 
-      <p className="text-xs text-muted-foreground/60 mt-3 italic">
+      <p className="text-[11px] text-muted-foreground/60 mt-1.5 italic">
         Dedicado a mi ahijada querida.
       </p>
     </div>
