@@ -19,8 +19,8 @@ export default function ProgressBar({ currentStep }) {
           const done = i < currentIndex;
           const active = i === currentIndex;
           return (
-            <React.Fragment key={step.key}>
-              <div className="flex flex-col items-center gap-1.5 flex-1">
+            <div key={step.key} className="flex items-center gap-1 flex-1">
+              <div className="flex flex-col items-center gap-1.5 w-full">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm ${
                   done
                     ? "bg-green-400 text-white"
@@ -41,7 +41,7 @@ export default function ProgressBar({ currentStep }) {
                   i < currentIndex ? "bg-green-300 dark:bg-green-700" : "bg-border/50"
                 }`} />
               )}
-            </React.Fragment>
+            </div>
           );
         })}
       </div>
