@@ -1,145 +1,89 @@
-import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { useState, useCallback } from "react";
 
-/**
- * Hook para gestionar proyectos en la base de datos.
- * Los proyectos son privados del usuario (protegidos por RLS automática).
- */
+const STORAGE_KEY = "imposition_projects";
+
+function load() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function persist(projects) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+}
+
 export function useProjects() {
-  const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [projects, setProjects] = useState(load);
 
-  // Cargar proyectos al montar
-  useEffect(() => {
-    loadProjects();
+  const saveProject = useCallback((name, config, imposition, summary, marksConfig) => {
+    const projectName = name || `Proyecto ${new Date().toLocaleDateString("es-ES")}`;
+    const existing = load();
+    const idx = existing.findIndex((p) => p.name === projectName);
+    const entry = {
+      id: idx >= 0 ? existing[idx].id : crypto.randomUUID(),
+      name: projectName,
+      config,
+      imposition,
+      summary,
+      marksConfig,
+      updated_date: new Date().toISOString(),
+    };
+    const updated = idx >= 0
+      ? existing.map((p, i) => (i === idx ? entry : p))
+      : [entry, ...existing];
+    persist(updated);
+    setProjects(updated);
+    return projectName;
   }, []);
 
-  const loadProjects = async () => {
-    try {
-      const data = await base44.entities.ImpositionProject.list('-updated_date');
-      setProjects(data);
-    } catch (e) {
-      console.error("Error cargando proyectos:", e);
-      setProjects([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const deleteProject = useCallback((id) => {
+    const updated = load().filter((p) => p.id !== id);
+    persist(updated);
+    setProjects(updated);
+  }, []);
 
-  const saveProject = async (name, config, imposition, summary, marksConfig) => {
-    try {
-      const projectName = name || `Proyecto ${new Date().toLocaleDateString("es-ES")}`;
-      
-      // Buscar si existe un proyecto con el mismo nombre
-      const existing = projects.find((p) => p.name === projectName);
-      
-      if (existing) {
-        // Actualizar existente
-        await base44.entities.ImpositionProject.update(existing.id, {
-          name: projectName,
-          config,
-          imposition,
-          summary,
-          marksConfig,
-        });
-      } else {
-        // Crear nuevo
-        await base44.entities.ImpositionProject.create({
-          name: projectName,
-          config,
-          imposition,
-          summary,
-          marksConfig,
-        });
-      }
-      
-      // Recargar lista
-      await loadProjects();
-      return projectName;
-    } catch (e) {
-      console.error("Error guardando proyecto:", e);
-      throw e;
-    }
-  };
+  const renameProject = useCallback((id, newName) => {
+    const updated = load().map((p) =>
+      p.id === id ? { ...p, name: newName, updated_date: new Date().toISOString() } : p
+    );
+    persist(updated);
+    setProjects(updated);
+  }, []);
 
-  const deleteProject = async (id) => {
-    const previousProjects = projects;
-    try {
-      // Optimistic UI update
-      setProjects((prev) => prev.filter((p) => p.id !== id));
-      await base44.entities.ImpositionProject.delete(id);
-    } catch (e) {
-      // Rollback on error
-      setProjects(previousProjects);
-      console.error("Error eliminando proyecto:", e);
-      throw e;
-    }
-  };
+  const loadProject = useCallback((id) => {
+    const project = load().find((p) => p.id === id);
+    if (!project) return null;
+    return {
+      config: project.config,
+      imposition: project.imposition,
+      summary: project.summary,
+      marksConfig: project.marksConfig,
+    };
+  }, []);
 
-  const renameProject = async (id, newName) => {
-    const previousProjects = projects;
-    try {
-      // Optimistic UI update
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === id ? { ...p, name: newName } : p
-        )
-      );
-      await base44.entities.ImpositionProject.update(id, { name: newName });
-    } catch (e) {
-      // Rollback on error
-      setProjects(previousProjects);
-      console.error("Error renombrando proyecto:", e);
-      throw e;
-    }
-  };
-
-  const getProject = (id) => {
-    return projects.find((p) => p.id === id);
-  };
-
-  const loadProject = (id) => {
-    const project = getProject(id);
-    if (project) {
-      return {
-        config: project.config,
-        imposition: project.imposition,
-        summary: project.summary,
-        marksConfig: project.marksConfig,
-      };
-    }
-    return null;
-  };
-
-  const duplicateProject = async (id) => {
-    try {
-      const project = getProject(id);
-      if (!project) return null;
-
-      await base44.entities.ImpositionProject.create({
-        name: `${project.name} (copia)`,
-        config: JSON.parse(JSON.stringify(project.config)),
-        imposition: JSON.parse(JSON.stringify(project.imposition)),
-        summary: JSON.parse(JSON.stringify(project.summary)),
-        marksConfig: JSON.parse(JSON.stringify(project.marksConfig)),
-      });
-
-      // Recargar lista
-      await loadProjects();
-      return true;
-    } catch (e) {
-      console.error("Error duplicando proyecto:", e);
-      throw e;
-    }
-  };
+  const duplicateProject = useCallback((id) => {
+    const existing = load();
+    const project = existing.find((p) => p.id === id);
+    if (!project) return;
+    const copy = {
+      ...project,
+      id: crypto.randomUUID(),
+      name: `${project.name} (copia)`,
+      updated_date: new Date().toISOString(),
+    };
+    const updated = [copy, ...existing];
+    persist(updated);
+    setProjects(updated);
+  }, []);
 
   return {
     projects,
-    isLoading,
+    isLoading: false,
     saveProject,
     deleteProject,
     renameProject,
-    getProject,
     loadProject,
     duplicateProject,
   };
