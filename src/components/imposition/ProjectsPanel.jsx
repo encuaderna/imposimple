@@ -184,7 +184,7 @@ export default function ProjectsPanel({
                       <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {new Date(project.updatedAt).toLocaleDateString("es-ES")}
+                          {project.updated_date ? new Date(project.updated_date).toLocaleDateString("es-ES") : "—"}
                         </span>
                         <span>
                           {project.config?.totalPages || 0} págs
