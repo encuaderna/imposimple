@@ -159,9 +159,18 @@ export default function Home() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
         >
-          <Welcome onStart={() => {
-            setShowWelcome(false);
-          }} />
+          <Welcome
+            onStart={() => setShowWelcome(false)}
+            onResume={(project) => {
+              const loaded = loadProject(project.id);
+              if (loaded) {
+                setConfig(loaded.config);
+                if (loaded.marksConfig) setMarksConfig(loaded.marksConfig);
+                setCurrentProjectName(project.name);
+              }
+              setShowWelcome(false);
+            }}
+          />
         </motion.div>
       </AnimatePresence>
     );

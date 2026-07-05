@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Focus, Eye, Type, Keyboard, Contrast, ArrowRight, Sparkles } from "lucide-react";
+import RecentProjectsSection from "@/components/imposition/RecentProjectsSection";
 
 const FEATURES = [
   {
@@ -53,7 +54,7 @@ const FEATURES = [
   },
 ];
 
-export default function Welcome({ onStart }) {
+export default function Welcome({ onStart, onResume }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center px-4 py-6">
 
@@ -94,6 +95,9 @@ export default function Welcome({ onStart }) {
           </div>
         ))}
       </div>
+
+      {/* Proyectos recientes */}
+      <RecentProjectsSection onResume={onResume} />
 
       {/* CTA */}
       <Button

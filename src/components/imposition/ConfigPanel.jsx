@@ -16,6 +16,7 @@ import PaperAdvisor from "@/components/imposition/PaperAdvisor";
 import PaperPresetsPanel from "@/components/imposition/PaperPresetsPanel";
 import RealtimeImpositionPreview from "@/components/imposition/RealtimeImpositionPreview";
 import ValidationWarnings from "@/components/imposition/ValidationWarnings";
+import SignatureImpositionPreview from "@/components/imposition/SignatureImpositionPreview";
 import { useImpositionValidation } from "@/hooks/useImpositionValidation";
 
 /** Burbuja de ayuda con ícono "i" azul visible */
@@ -405,6 +406,11 @@ export default function ConfigPanel({ config, onConfigChange, pdfFile, onPdfChan
           currentThickness={config.paperThickness}
           onApply={(t) => update("paperThickness", t)}
         />
+      )}
+
+      {/* Vista previa de imposición por cuadernillos */}
+      {imposition && !focusMode && (
+        <SignatureImpositionPreview imposition={imposition} />
       )}
 
       {/* Vista previa en tiempo real (siempre visible cuando hay imposición) */}
